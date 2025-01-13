@@ -1,0 +1,37 @@
+/* Reset and base styles */
+html, body, #root {
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden;
+  }
+  
+  body {
+    background-color: #000000;
+  }
+  
+  /* Navigation bar scroll handling */
+  nav {
+    overflow-x: auto;
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE and Edge */
+  }
+  
+  nav::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
+  }
+  
+  /* Make sure iframe content fills available space */
+  main {
+    position: relative;
+    overflow: hidden;
+    flex: 1;
+  }
+  
+  iframe {
+    border: none;
+    background: #000000;
+    width: 100%;
+    height: 100%;
+  }
