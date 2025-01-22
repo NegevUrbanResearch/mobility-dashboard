@@ -12,7 +12,7 @@ const PageNavigator: React.FC = () => {
   const pages: Page[] = [
     { title: 'Origin Index', path: 'pages/origin-index.html' },
     { title: 'Distance Visualization', path: 'pages/merged_distance_viz.html' },
-    { title: 'Catchment Area', path: 'pages/catchment/index.html' },
+    { title: 'Catchment Area', path: 'pages/catchment_dash.html' },
     { title: 'Route Intensity', path: 'pages/route_intensity_interactive.html' },
     { title: 'Temporal Visualization', path: 'pages/temporal_visualization.html' },
     { title: 'Trip Animation', path: 'pages/trip_animation_time_dark_nolabels.html' },
