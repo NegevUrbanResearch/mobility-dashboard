@@ -1,0 +1,405 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Beer Sheva Catchment Areas Dashboard</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            margin: 0; 
+            padding: 0;
+            background: #1a1a1a;
+            color: #ffffff;
+            font-size: 23px;
+        }
+        .controls { 
+            position: fixed;
+            top: 20px;
+            left: 60px;
+            background: rgba(33, 33, 33, 0.9);
+            padding: 12px;
+            border-radius: 8px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.3);
+            z-index: 1000;
+            width: 322px;
+        }
+        .controls h3 {
+            margin: 0 0 18px 0;
+            font-size: 27px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #ffffff;
+            border-bottom: 1px solid #444;
+            padding-bottom: 8px;
+        }
+        .btn-group { 
+            margin-bottom: 12px;
+        }
+        .btn-group p {
+            margin: 0 0 5px 0;
+            font-size: 23px;
+            color: #999;
+        }
+        button {
+            display: block;
+            width: 100%;
+            padding: 12px 18px;
+            margin: 2px 0;
+            border: 1px solid #444;
+            border-radius: 4px;
+            cursor: pointer;
+            background: #333;
+            color: #fff;
+            font-size: 23px;
+            text-align: left;
+            transition: all 0.2s ease;
+        }
+        button:hover {
+            background: #444;
+        }
+        button.active {
+            background: #0066cc;
+            border-color: #0077ee;
+        }
+        button.mode-btn {
+            padding-left: 24px;
+            position: relative;
+        }
+        button.mode-btn::before {
+            content: '';
+            position: absolute;
+            left: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+        
+        button.mode-btn.layered::before {
+            background-color: #FFEEAD;
+        }
+        
+        button.mode-btn.car::before {
+            background-color: #FF6B6B;
+        }
+        
+        button.mode-btn.transit::before {
+            background-color: #4ECDC4;
+        }
+        
+        button.mode-btn.walk::before {
+            background-color: #FFE66D;
+        }
+        
+        button.mode-btn.bike::before {
+            background-color: #96CEB4;
+        }
+        
+        .explanation {
+            position: fixed;
+            top: 20px;
+            right: 60px;
+            background: rgba(33, 33, 33, 0.9);
+            padding: 12px;
+            border-radius: 8px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.3);
+            z-index: 1000;
+            width: 498px;
+        }
+        .explanation h3 {
+            margin: 0 0 8px 0;
+            font-size: 27px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #ffffff;
+            border-bottom: 1px solid #444;
+            padding-bottom: 8px;
+        }
+        .explanation p {
+            margin: 0 0 8px 0;
+            line-height: 1.4;
+            color: #cccccc;
+        }
+        .legend-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+            margin-top: 12px;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .color-box {
+            width: 23px;
+            height: 23px;
+            border-radius: 2px;
+        }
+        .mode-name {
+            font-size: 23px;
+            color: #cccccc;
+        }
+        #map {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        #fade-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(26, 26, 26, 0.5);
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+            pointer-events: none;
+            z-index: 999;
+        }
+        #fade-overlay.active {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="controls">
+        <h3>Catchment Areas</h3>
+        <div class="btn-group">
+            <p>Location</p>
+            
+            <button onclick="selectPOI('BGU')" id="poi-BGU">Ben Gurion University</button>
+            
+            <button onclick="selectPOI('Soroka_Hospital')" id="poi-Soroka_Hospital">Soroka Hospital</button>
+            
+            <button onclick="selectPOI('Gev_Yam')" id="poi-Gev_Yam">Gav Yam High-Tech Park</button>
+            
+        </div>
+        <div class="btn-group">
+            <p>Transport Mode</p>
+            
+            <button onclick="selectMode('layered')" id="mode-layered" class="mode-btn layered">
+                All Modes
+            </button>
+            
+            <button onclick="selectMode('car')" id="mode-car" class="mode-btn car">
+                Car
+            </button>
+            
+            <button onclick="selectMode('transit')" id="mode-transit" class="mode-btn transit">
+                Public Transit
+            </button>
+            
+            <button onclick="selectMode('walk')" id="mode-walk" class="mode-btn walk">
+                Walking
+            </button>
+            
+            <button onclick="selectMode('bike')" id="mode-bike" class="mode-btn bike">
+                Bicycle
+            </button>
+            
+        </div>
+    </div>
+
+    <div class="explanation">
+        <h3>About Catchment Areas</h3>
+        <p id="explanation-text">Map shows where 90% of trips to each location originate from by mode.</p>
+        <div id="mode-legend" style="display: none;">
+            <div class="legend-grid">
+                
+                <div class="legend-item">
+                    <span class="color-box" style="background-color: #FF6B6B"></span>
+                    <span class="mode-name">Car</span>
+                </div>
+                
+                <div class="legend-item">
+                    <span class="color-box" style="background-color: #4ECDC4"></span>
+                    <span class="mode-name">Public Transit</span>
+                </div>
+                
+                <div class="legend-item">
+                    <span class="color-box" style="background-color: #FFE66D"></span>
+                    <span class="mode-name">Walking</span>
+                </div>
+                
+                <div class="legend-item">
+                    <span class="color-box" style="background-color: #96CEB4"></span>
+                    <span class="mode-name">Bicycle</span>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+
+    <div id="map"></div>
+    <div id="fade-overlay"></div>
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
+    <script>
+        // Embed all catchment data
+        const catchmentData = {"BGU": {"bounds": [34.56924526959899, 30.626897276099523, 35.23037222384999, 32.08433076700184], "center": [31.262218, 34.801472], "modes": {"bike": {"area": 0.00043076861712205516, "color": "#96CEB4", "geometry": {"coordinates": [[[34.79208041171158, 31.246261130607387], [34.79053802186049, 31.25570386782518], [34.789018661625015, 31.26900963818322], [34.79772798039277, 31.282798359733942], [34.80343150264815, 31.270971603347977], [34.80722070877522, 31.258752488286703], [34.796202066602255, 31.242561196578688], [34.79208041171158, 31.246261130607387]]], "type": "Polygon"}}, "car": {"area": 0.16260261278910582, "color": "#FF6B6B", "geometry": {"coordinates": [[[34.70388839889864, 31.024658616306798], [34.56924526959899, 31.4290822167143], [34.595820188907915, 31.528766637038455], [34.960754975055174, 31.328038020252706], [35.085628870746575, 31.24168476541378], [35.0464079512308, 31.07108801793993], [34.91939925788987, 30.989394885254907], [34.70388839889864, 31.024658616306798]]], "type": "Polygon"}}, "transit": {"area": 0.607801193157301, "color": "#4ECDC4", "geometry": {"coordinates": [[[34.614323083065585, 31.316105052552842], [34.57100206646957, 31.664668817282678], [34.792458392693646, 32.08433076700184], [34.874039985719584, 32.062202296775865], [34.9517090318422, 31.999228687251215], [35.20522194466407, 31.7788171713412], [35.23037222384999, 31.285532220016325], [35.22367135812832, 31.249922505474558], [34.817721005694146, 30.626897276099523], [34.614323083065585, 31.316105052552842]]], "type": "Polygon"}}, "walk": {"area": 0.00034577361819262715, "color": "#FFE66D", "geometry": {"coordinates": [[[34.79053802186049, 31.25570386782518], [34.79130442045332, 31.260082830705162], [34.793560913507974, 31.272781818746274], [34.80343150264815, 31.270971603347977], [34.8135047672524, 31.264721198572644], [34.80574828902443, 31.249354876022387], [34.79053802186049, 31.25570386782518]]], "type": "Polygon"}}}}, "Gev_Yam": {"bounds": [34.57100206646957, 30.626897276099523, 35.23037222384999, 31.92226178996439], "center": [31.2635, 34.8035], "modes": {"car": {"area": 0.5699870305725597, "color": "#FF6B6B", "geometry": {"coordinates": [[[34.574232913264595, 31.41673960326309], [34.57100206646957, 31.664668817282678], [34.65980289913556, 31.80878619333203], [34.73279036287618, 31.874222347732598], [34.79244994756452, 31.92226178996439], [34.989920353138466, 31.896977560287475], [35.20522194466407, 31.7788171713412], [35.23037222384999, 31.285532220016325], [35.22367135812832, 31.249922505474558], [34.817721005694146, 30.626897276099523], [34.574232913264595, 31.41673960326309]]], "type": "Polygon"}}, "transit": {"area": 0.5400266413526706, "color": "#4ECDC4", "geometry": {"coordinates": [[[34.63035434243112, 31.317517342693982], [34.57100206646957, 31.664668817282678], [34.65980289913556, 31.80878619333203], [34.989920353138466, 31.896977560287475], [35.20522194466407, 31.7788171713412], [35.23037222384999, 31.285532220016325], [35.22367135812832, 31.249922505474558], [34.817721005694146, 30.626897276099523], [34.63035434243112, 31.317517342693982]]], "type": "Polygon"}}, "walk": {"area": 0.00024877571890470987, "color": "#FFE66D", "geometry": {"coordinates": [[[34.79623451875376, 31.262414060991492], [34.79896646843623, 31.270112896453025], [34.80343150264815, 31.270971603347977], [34.82216066716116, 31.269240201171957], [34.807938334776914, 31.254202527456016], [34.79623451875376, 31.262414060991492]]], "type": "Polygon"}}}}, "Soroka_Hospital": {"bounds": [34.56924526959899, 30.626897276099523, 35.23037222384999, 31.927065150958295], "center": [31.26265, 34.799452], "modes": {"bike": {"area": 0.0014536376051543969, "color": "#96CEB4", "geometry": {"coordinates": [[[34.76107581099681, 31.265978026854295], [34.79772798039277, 31.282798359733942], [34.82216066716116, 31.269240201171957], [34.796202066602255, 31.242561196578688], [34.78408636461147, 31.23770271271363], [34.76107581099681, 31.265978026854295]]], "type": "Polygon"}}, "car": {"area": 0.20435012859679771, "color": "#FF6B6B", "geometry": {"coordinates": [[[34.70388839889864, 31.024658616306798], [34.56924526959899, 31.4290822167143], [34.595820188907915, 31.528766637038455], [34.774737456158, 31.60705729939872], [35.085628870746575, 31.24168476541378], [35.0464079512308, 31.07108801793993], [35.024078574187, 31.05490502702153], [34.91939925788987, 30.989394885254907], [34.70388839889864, 31.024658616306798]]], "type": "Polygon"}}, "transit": {"area": 0.5725155550338452, "color": "#4ECDC4", "geometry": {"coordinates": [[[34.56924526959899, 31.4290822167143], [34.57100206646957, 31.664668817282678], [34.65980289913556, 31.80878619333203], [34.73279036287618, 31.874222347732598], [34.79244994756452, 31.92226178996439], [34.87066665214553, 31.927065150958295], [34.989920353138466, 31.896977560287475], [35.20522194466407, 31.7788171713412], [35.23037222384999, 31.285532220016325], [35.22367135812832, 31.249922505474558], [34.817721005694146, 30.626897276099523], [34.56924526959899, 31.4290822167143]]], "type": "Polygon"}}, "walk": {"area": 0.000529615474395121, "color": "#FFE66D", "geometry": {"coordinates": [[[34.79208041171158, 31.246261130607387], [34.78442790047252, 31.261534438753753], [34.793560913507974, 31.272781818746274], [34.80343150264815, 31.270971603347977], [34.8135047672524, 31.264721198572644], [34.80574828902443, 31.249354876022387], [34.796202066602255, 31.242561196578688], [34.79208041171158, 31.246261130607387]]], "type": "Polygon"}}}}};
+        const poiInfo = {"BGU": {"display": "Ben Gurion University", "file": "bgu"}, "Gev_Yam": {"display": "Gav Yam High-Tech Park", "file": "gev_yam"}, "Soroka_Hospital": {"display": "Soroka Hospital", "file": "soroka_hospital"}};
+        const modeInfo = {"bike": {"color": "#96CEB4", "display": "Bicycle"}, "car": {"color": "#FF6B6B", "display": "Car"}, "layered": {"color": "#FFEEAD", "display": "All Modes"}, "transit": {"color": "#4ECDC4", "display": "Public Transit"}, "walk": {"color": "#FFE66D", "display": "Walking"}};
+        
+        let currentPOI = 'BGU';
+        let currentMode = 'layered';
+        let currentLayer = null;
+        let map = null;
+
+        function updateExplanation() {
+            const explanationText = document.getElementById('explanation-text');
+            const modeLegend = document.getElementById('mode-legend');
+            
+            if (currentMode === 'layered') {
+                explanationText.textContent = 'Map shows where 90% of trips to each location originate from by mode.';
+                modeLegend.style.display = 'block';
+            } else {
+                explanationText.textContent = `Map shows where 90% of trips to each location originate from by ${modeInfo[currentMode].display.toLowerCase()}.`;
+                modeLegend.style.display = 'none';
+            }
+        }
+
+        function initMap() {
+            if (!map) {
+                map = L.map('map', {
+                    preferCanvas: true,
+                    zoomControl: true
+                });
+
+                L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+                    maxZoom: 19
+                }).addTo(map);
+
+                // Set bounds to show all of Beer Sheva metropolitan area
+                const bounds = L.latLngBounds(
+                    [31.15, 34.65],  // Southwest corner
+                    [31.35, 34.95]   // Northeast corner
+                );
+                map.fitBounds(bounds);
+            }
+        }
+
+        function updateMap() {
+            initMap();
+            const fadeOverlay = document.getElementById('fade-overlay');
+            fadeOverlay.classList.add('active');
+
+            // Remove current layer if it exists
+            if (currentLayer) {
+                map.removeLayer(currentLayer);
+            }
+
+            const poiData = catchmentData[currentPOI];
+            const newLayer = L.layerGroup();
+            let currentBounds = null;
+            
+            if (currentMode === 'layered') {
+                // Sort modes by area before adding to map
+                const sortedModes = Object.entries(poiData.modes)
+                    .sort((a, b) => b[1].area - a[1].area);
+                
+                sortedModes.forEach(([mode, data]) => {
+                    const layer = L.geoJSON(data.geometry, {
+                        style: {
+                            color: data.color,
+                            fillColor: data.color,
+                            fillOpacity: 0.6,
+                            weight: 1
+                        }
+                    }).addTo(newLayer);
+                    
+                    // Update bounds to include all layers
+                    if (!currentBounds) {
+                        currentBounds = layer.getBounds();
+                    } else {
+                        currentBounds.extend(layer.getBounds());
+                    }
+                });
+            } else if (poiData.modes[currentMode]) {
+                const modeData = poiData.modes[currentMode];
+                const layer = L.geoJSON(modeData.geometry, {
+                    style: {
+                        color: modeData.color,
+                        fillColor: modeData.color,
+                        fillOpacity: 0.6,
+                        weight: 1
+                    }
+                }).addTo(newLayer);
+                
+                // Use specific mode bounds
+                currentBounds = layer.getBounds();
+            }
+
+            // Add POI marker
+            L.circleMarker(poiData.center, {
+                radius: 8,
+                color: 'white',
+                fillColor: 'white',
+                fillOpacity: 0.2,
+                weight: 3
+            })
+            .bindPopup(poiInfo[currentPOI].display)
+            .addTo(newLayer);
+
+            // Add new layer to map
+            newLayer.addTo(map);
+            currentLayer = newLayer;
+
+            // Fit bounds with mode-specific padding and zoom adjustments
+            if (currentBounds) {
+                let padding = [50, 50];  // Default padding
+                let maxZoom = 13;        // Default max zoom
+                
+                // Adjust zoom and padding based on mode
+                if (currentMode === 'walk') {
+                    padding = [30, 30];  // Tighter padding for walking
+                    maxZoom = 14;        // Allow closer zoom for walking
+                } else if (currentMode === 'bike') {
+                    padding = [40, 40];
+                    maxZoom = 13;
+                } else if (currentMode === 'layered') {
+                    padding = [60, 60];  // Larger padding for all modes
+                    maxZoom = 12;        // Further out for overview
+                }
+                
+                map.fitBounds(currentBounds, {
+                    padding: padding,
+                    maxZoom: maxZoom
+                });
+            }
+
+            // Update UI
+            document.querySelectorAll('button').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(`poi-${currentPOI}`).classList.add('active');
+            document.getElementById(`mode-${currentMode}`).classList.add('active');
+            
+            updateExplanation();
+
+            // Remove fade overlay
+            setTimeout(() => {
+                fadeOverlay.classList.remove('active');
+            }, 300);
+        }
+
+        function selectPOI(poi) {
+            currentPOI = poi;
+            updateMap();
+        }
+
+        function selectMode(mode) {
+            currentMode = mode;
+            updateMap();
+        }
+
+        // Initialize with first POI
+        document.addEventListener('DOMContentLoaded', function() {
+            selectPOI('BGU');
+            selectMode('layered');
+        });
+    </script>
+</body>
+</html>
