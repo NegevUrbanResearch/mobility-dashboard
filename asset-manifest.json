@@ -1,13 +1,13 @@
 {
   "files": {
-    "main.css": "/dataviz_pages/static/css/main.c5663cf3.css",
-    "main.js": "/dataviz_pages/static/js/main.728c9eb9.js",
+    "main.css": "/dataviz_pages/static/css/main.717cbe28.css",
+    "main.js": "/dataviz_pages/static/js/main.ff709a8b.js",
     "index.html": "/dataviz_pages/index.html",
-    "main.c5663cf3.css.map": "/dataviz_pages/static/css/main.c5663cf3.css.map",
-    "main.728c9eb9.js.map": "/dataviz_pages/static/js/main.728c9eb9.js.map"
+    "main.717cbe28.css.map": "/dataviz_pages/static/css/main.717cbe28.css.map",
+    "main.ff709a8b.js.map": "/dataviz_pages/static/js/main.ff709a8b.js.map"
   },
   "entrypoints": [
-    "static/css/main.c5663cf3.css",
-    "static/js/main.728c9eb9.js"
+    "static/css/main.717cbe28.css",
+    "static/js/main.ff709a8b.js"
   ]
 }
