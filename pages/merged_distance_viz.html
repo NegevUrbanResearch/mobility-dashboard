@@ -53,6 +53,7 @@
             padding: 20px;
         }
     </style>
+    <link rel="stylesheet" href="../css/loading-screen.css">
 </head>
 <body>
     <div id="error-message"></div>
@@ -156,20 +157,67 @@
             const [selectedLocation, setSelectedLocation] = React.useState('bgu');
             const [selectedMode, setSelectedMode] = React.useState('walk');
             const [isLoading, setIsLoading] = React.useState(true);
-            const [error, setError] = React.useState(null);
+            const [loadingProgress, setLoadingProgress] = React.useState(0);
 
             React.useEffect(() => {
-                checkDependencies()
-                    .then(() => setIsLoading(false))
-                    .catch(err => setError(err.message));
+                // Check dependencies with progress
+                const checkDeps = async () => {
+                    try {
+                        setLoadingProgress(30);
+                        await new Promise(resolve => setTimeout(resolve, 300));
+                        
+                        if (!window.Recharts) {
+                            setLoadingProgress(60);
+                            await new Promise((resolve, reject) => {
+                                const interval = setInterval(() => {
+                                    if (window.Recharts) {
+                                        clearInterval(interval);
+                                        resolve();
+                                    }
+                                }, 100);
+                                
+                                setTimeout(() => {
+                                    clearInterval(interval);
+                                    reject(new Error('Timeout loading Recharts'));
+                                }, 5000);
+                            });
+                        }
+                        
+                        setLoadingProgress(90);
+                        await new Promise(resolve => setTimeout(resolve, 300));
+                        setLoadingProgress(100);
+                        setIsLoading(false);
+                    } catch (err) {
+                        console.error('Loading error:', err);
+                        document.getElementById('error-message').style.display = 'block';
+                        document.getElementById('error-message').textContent = 
+                            `Error loading visualization: ${err.message}`;
+                    }
+                };
+                
+                checkDeps();
             }, []);
 
-            if (error) {
-                return <div style={{color: '#ff6b6b'}}>Error: {error}</div>;
-            }
-
             if (isLoading) {
-                return <div className="loading">Loading dependencies...</div>;
+                return (
+                    <div className="loading-screen">
+                        <div className="loading-spinner-container">
+                            <div className="loading-spinner-bg"></div>
+                            <div className="loading-spinner"></div>
+                        </div>
+                        <div className="loading-progress-container">
+                            <div className="loading-progress-bg">
+                                <div 
+                                    className="loading-progress-fill"
+                                    style={{ width: `${loadingProgress}%` }}
+                                />
+                            </div>
+                            <div className="loading-progress-text">
+                                Loading visualization... {Math.round(loadingProgress)}%
+                            </div>
+                        </div>
+                    </div>
+                );
             }
 
             const {

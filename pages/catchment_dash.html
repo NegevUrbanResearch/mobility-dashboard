@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html>
 <head>
@@ -164,8 +163,22 @@
             opacity: 1;
         }
     </style>
+    <link rel="stylesheet" href="../css/loading-screen.css">
 </head>
 <body>
+    <div class="loading-screen">
+        <div class="loading-spinner-container">
+            <div class="loading-spinner-bg"></div>
+            <div class="loading-spinner"></div>
+        </div>
+        <div class="loading-progress-container">
+            <div class="loading-progress-bg">
+                <div class="loading-progress-fill"></div>
+            </div>
+            <div class="loading-progress-text">Loading map data...</div>
+        </div>
+    </div>
+
     <div class="controls">
         <h3>Catchment Areas</h3>
         <div class="btn-group">
@@ -250,6 +263,24 @@
         let currentLayer = null;
         let map = null;
 
+        let loadingProgress = 0;
+        const loadingScreen = document.querySelector('.loading-screen');
+        const progressFill = document.querySelector('.loading-progress-fill');
+        const progressText = document.querySelector('.loading-progress-text');
+
+        function updateLoadingProgress(progress) {
+            loadingProgress = progress;
+            progressFill.style.width = `${progress}%`;
+            progressText.textContent = `Loading map data... ${Math.round(progress)}%`;
+        }
+
+        function hideLoadingScreen() {
+            loadingScreen.style.opacity = '0';
+            setTimeout(() => {
+                loadingScreen.style.display = 'none';
+            }, 300);
+        }
+
         function updateExplanation() {
             const explanationText = document.getElementById('explanation-text');
             const modeLegend = document.getElementById('mode-legend');
@@ -263,17 +294,24 @@
             }
         }
 
-        function initMap() {
+        async function initMap() {
+            updateLoadingProgress(30);
             if (!map) {
                 map = L.map('map', {
                     preferCanvas: true,
                     zoomControl: true
                 });
-
-                L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-                    maxZoom: 19
-                }).addTo(map);
-
+                
+                updateLoadingProgress(60);
+                
+                await new Promise(resolve => {
+                    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+                        maxZoom: 19,
+                        onload: () => resolve()
+                    }).addTo(map);
+                });
+                
+                updateLoadingProgress(90);
                 // Set bounds to show all of Beer Sheva metropolitan area
                 const bounds = L.latLngBounds(
                     [31.15, 34.65],  // Southwest corner
@@ -281,6 +319,7 @@
                 );
                 map.fitBounds(bounds);
             }
+            hideLoadingScreen();
         }
 
         function updateMap() {
