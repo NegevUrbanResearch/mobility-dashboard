@@ -367,6 +367,17 @@
         
         // Initial update
         updateVisualization(currentTime);
+        window.addEventListener('load', function() {
+        // Short delay to ensure everything is loaded
+        setTimeout(() => {
+            // Simulate click on play button
+            document.getElementById('playButton').click();
+            
+            // Update speed to default value
+            document.getElementById('speedSlider').value = "0.5";
+            document.getElementById('speedValue').textContent = "0.5x";
+        }, 1000);  // 1 second delay after load
+    });
     </script>
 </body>
 </html>

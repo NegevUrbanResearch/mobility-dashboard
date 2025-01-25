@@ -8,15 +8,19 @@ interface Page {
 const PageNavigator: React.FC = () => {
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [currentUrl, setCurrentUrl] = useState<string>('');
+  const [nextPageUrl, setNextPageUrl] = useState<string>('');
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [loadingProgress, setLoadingProgress] = useState<number>(0);
 
   const pages: Page[] = [
-    { title: 'Origin Index', path: 'pages/origin-index.html' },
     { title: 'Distance Visualization', path: 'pages/merged_distance_viz.html' },
+    { title: 'Walking Arc', path: 'pages/walking_arc_visualization_glow.html' },
+    { title: 'Temporal Visualization', path: 'pages/temporal_visualization.html' },
+    { title: 'Origin Statistics', path: 'pages/origin_statistics.html' },
+    { title: 'Origin Index', path: 'pages/origin-index.html' },
     { title: 'Catchment Area', path: 'pages/catchment_dash.html' },
     { title: 'Route Intensity', path: 'pages/route_intensity_interactive.html' },
-    { title: 'Temporal Visualization', path: 'pages/temporal_visualization.html' },
     { title: 'Trip Animation', path: 'pages/trip_animation_time_dark_nolabels.html' },
-    { title: 'Walking Arc', path: 'pages/walking_arc_visualization_glow.html' },
     { title: 'Walking Trip Animation', path: 'pages/walking_trip_animation.html' }
   ];
 
@@ -28,10 +32,54 @@ const PageNavigator: React.FC = () => {
     goToPage(0);
   }, []);
 
+  // Preload next page
+  useEffect(() => {
+    const nextIndex = (currentPage + 1) % pages.length;
+    const nextPath = getPagePath(pages[nextIndex].path);
+    setNextPageUrl(nextPath);
+    
+    // Create hidden iframe for preloading
+    const preloadFrame = document.createElement('iframe');
+    preloadFrame.style.display = 'none';
+    preloadFrame.src = nextPath;
+    document.body.appendChild(preloadFrame);
+
+    return () => {
+      document.body.removeChild(preloadFrame);
+    };
+  }, [currentPage]);
+
   const goToPage = (index: number): void => {
+    setIsLoading(true);
+    setLoadingProgress(0);
     setCurrentPage(index);
     const fullPath = getPagePath(pages[index].path);
     setCurrentUrl(fullPath);
+    
+    // Simulate progress while loading
+    const progressInterval = setInterval(() => {
+      setLoadingProgress(prev => {
+        if (prev >= 90) {
+          clearInterval(progressInterval);
+          return 90;
+        }
+        return prev + Math.random() * 10;
+      });
+    }, 200);
+    
+    // Show loading state in current iframe
+    const iframe = document.getElementById('content-frame') as HTMLIFrameElement;
+    if (iframe) {
+      iframe.onload = () => {
+        clearInterval(progressInterval);
+        setLoadingProgress(100);
+        setTimeout(() => {
+          setIsLoading(false);
+          iframe.style.opacity = '1';
+        }, 500); // Short delay to show 100%
+      };
+      iframe.style.opacity = '0';
+    }
   };
 
   // Button styles
@@ -61,6 +109,34 @@ const PageNavigator: React.FC = () => {
 
   return (
     <div style={{ width: '100vw', height: '100vh', backgroundColor: 'black' }}>
+      {isLoading && (
+        <div className="loading-screen">
+          <div className="loading-spinner-container">
+            <div className="loading-spinner-bg"></div>
+            <div className="loading-spinner"></div>
+          </div>
+          
+          <div className="loading-text">
+            Loading
+            <span className="loading-dot">.</span>
+            <span className="loading-dot">.</span>
+            <span className="loading-dot">.</span>
+          </div>
+          
+          <div className="loading-progress-container">
+            <div className="loading-progress-bg">
+              <div 
+                className="loading-progress-fill" 
+                style={{ width: `${Math.round(loadingProgress)}%` }}
+              />
+            </div>
+            <div className="loading-progress-text">
+              {Math.round(loadingProgress)}%
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Navigation bar - fixed height */}
       <div style={{ 
         width: '100%', 
