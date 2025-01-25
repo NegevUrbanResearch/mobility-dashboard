@@ -11,6 +11,7 @@ const PageNavigator: React.FC = () => {
   const [nextPageUrl, setNextPageUrl] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [loadingProgress, setLoadingProgress] = useState<number>(0);
+  const [isMenuVisible, setIsMenuVisible] = useState<boolean>(true);
 
   const pages: Page[] = [
     { title: 'Distance Visualization', path: 'pages/merged_distance_viz.html' },
@@ -107,6 +108,11 @@ const PageNavigator: React.FC = () => {
     transform: 'scale(1.02)',
   };
 
+  // Add toggle function
+  const toggleMenu = () => {
+    setIsMenuVisible(!isMenuVisible);
+  };
+
   return (
     <div style={{ width: '100vw', height: '100vh', backgroundColor: 'black' }}>
       {isLoading && (
@@ -137,25 +143,64 @@ const PageNavigator: React.FC = () => {
         </div>
       )}
 
-      {/* Navigation bar - fixed height */}
+      {/* Menu toggle button */}
+      <button
+        onClick={toggleMenu}
+        onMouseEnter={(e) => {
+          const btn = e.target as HTMLElement;
+          btn.style.backgroundColor = 'rgba(30, 64, 175, 0.8)';
+          btn.style.color = 'white';
+        }}
+        onMouseLeave={(e) => {
+          const btn = e.target as HTMLElement;
+          btn.style.backgroundColor = 'rgba(30, 64, 175, 0.6)';
+          btn.style.color = 'rgba(255, 255, 255, 0.8)';
+        }}
+        style={{
+          position: 'fixed',
+          top: '10px',
+          right: '10px',
+          zIndex: 1000,
+          padding: '6px 12px',
+          backgroundColor: 'rgba(30, 64, 175, 0.6)',
+          color: 'rgba(255, 255, 255, 0.8)',
+          border: 'none',
+          borderRadius: '4px',
+          cursor: 'pointer',
+          fontSize: '12px',
+          transition: 'all 0.3s ease',
+          backdropFilter: 'blur(4px)',
+          boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
+        }}
+      >
+        {isMenuVisible ? '▲' : '▼'}
+      </button>
+
+      {/* Navigation bar with transition */}
       <div style={{ 
         width: '100%', 
-        height: '80px', 
-        backgroundColor: '#0f172a', // Dark blue background
+        height: isMenuVisible ? '80px' : '0px',
+        backgroundColor: '#0f172a',
         borderBottom: '1px solid #1e293b',
-        display: 'flex',
-        alignItems: 'center'
+        transition: 'all 0.3s ease',
+        overflow: 'hidden',
+        position: 'relative'
       }}>
-        <div style={{ 
-          maxWidth: '1400px', 
-          margin: '0 auto',
-          padding: '0 24px',
-          overflowX: 'auto',
-          whiteSpace: 'nowrap',
-          msOverflowStyle: 'none', // Hide scrollbar in IE/Edge
-          scrollbarWidth: 'none', // Hide scrollbar in Firefox
-          WebkitOverflowScrolling: 'touch', // Smooth scrolling on iOS
-        }}>
+        <div 
+          className="scrollable-menu"
+          style={{ 
+            width: '100%',
+            height: '80px',
+            overflowX: 'auto',
+            overflowY: 'hidden',
+            whiteSpace: 'nowrap',
+            display: 'flex',
+            alignItems: 'center',
+            padding: '0 24px',
+            msOverflowStyle: 'none',
+            scrollbarWidth: 'none',
+            WebkitOverflowScrolling: 'touch'
+          }}>
           {pages.map((page, index) => (
             <button
               key={index}
@@ -176,11 +221,12 @@ const PageNavigator: React.FC = () => {
         </div>
       </div>
 
-      {/* Content area - fills remaining height */}
+      {/* Content area - adjust height based on menu visibility */}
       <div style={{ 
         width: '100%', 
-        height: 'calc(100vh - 80px)',
-        position: 'relative'
+        height: isMenuVisible ? 'calc(100vh - 80px)' : '100vh',
+        position: 'relative',
+        transition: 'all 0.3s ease'
       }}>
         <iframe
           id="content-frame"
