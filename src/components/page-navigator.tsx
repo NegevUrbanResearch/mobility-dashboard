@@ -85,11 +85,11 @@ const PageNavigator: React.FC = () => {
 
   // Button styles
   const buttonStyle = (isActive: boolean) => ({
-    padding: '10px 20px',
-    marginRight: '12px',
-    fontSize: '14px',
-    fontWeight: 500,
-    backgroundColor: isActive ? '#2563eb' : '#1e40af', // Bright blue when active, darker blue when inactive
+    padding: '12px 24px',
+    marginRight: '16px',
+    fontSize: '16px',
+    fontWeight: 600,
+    backgroundColor: isActive ? '#2563eb' : '#1e40af',
     color: 'white',
     border: 'none',
     borderRadius: '8px',
@@ -179,7 +179,7 @@ const PageNavigator: React.FC = () => {
       {/* Navigation bar with transition */}
       <div style={{ 
         width: '100%', 
-        height: isMenuVisible ? '80px' : '0px',
+        height: isMenuVisible ? '100px' : '0px',
         backgroundColor: '#0f172a',
         borderBottom: '1px solid #1e293b',
         transition: 'all 0.3s ease',
@@ -190,7 +190,7 @@ const PageNavigator: React.FC = () => {
           className="scrollable-menu"
           style={{ 
             width: '100%',
-            height: '80px',
+            height: '100px',
             overflowX: 'auto',
             overflowY: 'hidden',
             whiteSpace: 'nowrap',
@@ -224,7 +224,7 @@ const PageNavigator: React.FC = () => {
       {/* Content area - adjust height based on menu visibility */}
       <div style={{ 
         width: '100%', 
-        height: isMenuVisible ? 'calc(100vh - 80px)' : '100vh',
+        height: isMenuVisible ? 'calc(100vh - 100px)' : '100vh',
         position: 'relative',
         transition: 'all 0.3s ease'
       }}>
