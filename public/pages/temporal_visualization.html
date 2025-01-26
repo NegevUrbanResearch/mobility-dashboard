@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Temporal Trip Patterns</title>
+    <title>Temporal Trip Distributions</title>
     <meta charset="utf-8">
     <!-- Core React -->
     <script src="https://unpkg.com/react@17.0.2/umd/react.development.js"></script>
@@ -45,6 +45,42 @@
             margin-right: 4px;
             border-radius: 2px;
         }
+        .toggle-button {
+            background: #333;
+            color: #fff;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-bottom: 16px;
+        }
+        .toggle-button:hover {
+            background: #444;
+        }
+        .mode-toggle {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .mode-toggle button {
+            background: transparent;
+            color: #fff;
+            border: 1px solid #444;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+        .mode-toggle button.active {
+            background: #444;
+            border-color: #666;
+        }
+        .mode-toggle button:hover {
+            background: #333;
+        }
     </style>
 </head>
 <body>
@@ -52,7 +88,7 @@
     <script type="text/babel">
         const { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } = Recharts;
         
-        const temporalData = [{"hour": "00:00", "Ben-Gurion-University": 0.0, "Soroka-Medical-Center": 0.0163246492601, "Gav-Yam-High-Tech-Park": 0.0, "Beer-Sheva-Comparisons": 0.06504176773537}, {"hour": "01:00", "Ben-Gurion-University": 0.005669737774627924, "Soroka-Medical-Center": 0.11427254482075999, "Gav-Yam-High-Tech-Park": 0.0, "Beer-Sheva-Comparisons": 0.011669959774772204}, {"hour": "02:00", "Ben-Gurion-University": 0.0, "Soroka-Medical-Center": 0.14019992893976, "Gav-Yam-High-Tech-Park": 0.0, "Beer-Sheva-Comparisons": 0.015070869453474443}, {"hour": "03:00", "Ben-Gurion-University": 0.0, "Soroka-Medical-Center": 0.11235199784897999, "Gav-Yam-High-Tech-Park": 0.0, "Beer-Sheva-Comparisons": 0.004319557699197777}, {"hour": "04:00", "Ben-Gurion-University": 0.01417434443656, "Soroka-Medical-Center": 0.1277163736232, "Gav-Yam-High-Tech-Park": 0.06923929098966, "Beer-Sheva-Comparisons": 0.0446743403861611}, {"hour": "05:00", "Ben-Gurion-University": 0.46397354122371004, "Soroka-Medical-Center": 0.39467240270028, "Gav-Yam-High-Tech-Park": 0.66931314623338, "Beer-Sheva-Comparisons": 0.18803358375443557}, {"hour": "06:00", "Ben-Gurion-University": 0.65485471296952, "Soroka-Medical-Center": 3.64999951986325, "Gav-Yam-High-Tech-Park": 2.43722304283604, "Beer-Sheva-Comparisons": 1.6539267424555189}, {"hour": "07:00", "Ben-Gurion-University": 5.20481927710843, "Soroka-Medical-Center": 15.43927710611982, "Gav-Yam-High-Tech-Park": 9.08419497784342, "Beer-Sheva-Comparisons": 5.42392647567122}, {"hour": "08:00", "Ben-Gurion-University": 17.734939759036138, "Soroka-Medical-Center": 14.774767853884779, "Gav-Yam-High-Tech-Park": 19.46085672082717, "Beer-Sheva-Comparisons": 9.20577966302107}, {"hour": "09:00", "Ben-Gurion-University": 16.64068036853295, "Soroka-Medical-Center": 9.71124576279324, "Gav-Yam-High-Tech-Park": 12.36152141802068, "Beer-Sheva-Comparisons": 8.525460026207911}, {"hour": "10:00", "Ben-Gurion-University": 12.469643278998339, "Soroka-Medical-Center": 7.428675686835611, "Gav-Yam-High-Tech-Park": 6.896233382570161, "Beer-Sheva-Comparisons": 8.30403639726282}, {"hour": "11:00", "Ben-Gurion-University": 8.63406567446255, "Soroka-Medical-Center": 6.967744413608989, "Gav-Yam-High-Tech-Park": 3.2957902511078196, "Beer-Sheva-Comparisons": 7.285113979729411}, {"hour": "12:00", "Ben-Gurion-University": 8.25230333097094, "Soroka-Medical-Center": 5.17971518288408, "Gav-Yam-High-Tech-Park": 3.6373707533234803, "Beer-Sheva-Comparisons": 6.463224720849525}, {"hour": "13:00", "Ben-Gurion-University": 7.57949444838176, "Soroka-Medical-Center": 5.4351479301305, "Gav-Yam-High-Tech-Park": 3.69276218611521, "Beer-Sheva-Comparisons": 6.897673813764832}, {"hour": "14:00", "Ben-Gurion-University": 6.21497755728797, "Soroka-Medical-Center": 6.0526037815569795, "Gav-Yam-High-Tech-Park": 3.2080871491875897, "Beer-Sheva-Comparisons": 6.035749906412028}, {"hour": "15:00", "Ben-Gurion-University": 3.52941176470588, "Soroka-Medical-Center": 3.9448034800311103, "Gav-Yam-High-Tech-Park": 3.93740768094534, "Beer-Sheva-Comparisons": 6.142483653036597}, {"hour": "16:00", "Ben-Gurion-University": 4.24568863690054, "Soroka-Medical-Center": 4.2184814235094095, "Gav-Yam-High-Tech-Park": 6.52695716395864, "Beer-Sheva-Comparisons": 6.9099461890511735}, {"hour": "17:00", "Ben-Gurion-University": 2.99551145759508, "Soroka-Medical-Center": 3.60006529859704, "Gav-Yam-High-Tech-Park": 7.38552437223042, "Beer-Sheva-Comparisons": 8.729708570388867}, {"hour": "18:00", "Ben-Gurion-University": 2.63737302149775, "Soroka-Medical-Center": 3.34943391878006, "Gav-Yam-High-Tech-Park": 4.47747415066469, "Beer-Sheva-Comparisons": 6.377988633962267}, {"hour": "19:00", "Ben-Gurion-University": 1.6791873375856299, "Soroka-Medical-Center": 3.83149120869623, "Gav-Yam-High-Tech-Park": 3.83585672082717, "Beer-Sheva-Comparisons": 5.365199393819041}, {"hour": "20:00", "Ben-Gurion-University": 0.6076068981809499, "Soroka-Medical-Center": 2.2335961281773, "Gav-Yam-High-Tech-Park": 4.14050960118168, "Beer-Sheva-Comparisons": 3.641020485018989}, {"hour": "21:00", "Ben-Gurion-University": 0.26553271911174, "Soroka-Medical-Center": 0.9602734858887799, "Gav-Yam-High-Tech-Park": 3.60505908419497, "Beer-Sheva-Comparisons": 1.6813709914251456}, {"hour": "22:00", "Ben-Gurion-University": 0.0822111977321, "Soroka-Medical-Center": 1.9551168172695501, "Gav-Yam-High-Tech-Park": 0.6923929098966, "Beer-Sheva-Comparisons": 0.7689702548120609}, {"hour": "23:00", "Ben-Gurion-University": 0.08788093550673, "Soroka-Medical-Center": 0.36202310418007, "Gav-Yam-High-Tech-Park": 0.5862259970457899, "Beer-Sheva-Comparisons": 0.25961002430802776}];
+        const temporalData = {"inbound": [{"hour": "00:00", "displayHour": "00:00-01:00", "x": 0.5, "Ben-Gurion-University": 0.0, "Soroka-Medical-Center": 0.0163246492601, "Gav-Yam-High-Tech-Park": 0.0, "Beer-Sheva-Comparisons": 0.06504176773537006}, {"hour": "01:00", "displayHour": "01:00-02:00", "x": 1.5, "Ben-Gurion-University": 0.005669737774627924, "Soroka-Medical-Center": 0.11427254482075999, "Gav-Yam-High-Tech-Park": 0.0, "Beer-Sheva-Comparisons": 0.011669959774772212}, {"hour": "02:00", "displayHour": "02:00-03:00", "x": 2.5, "Ben-Gurion-University": 0.0, "Soroka-Medical-Center": 0.14019992893976, "Gav-Yam-High-Tech-Park": 0.0, "Beer-Sheva-Comparisons": 0.015070869453474455}, {"hour": "03:00", "displayHour": "03:00-04:00", "x": 3.5, "Ben-Gurion-University": 0.0, "Soroka-Medical-Center": 0.11235199784897999, "Gav-Yam-High-Tech-Park": 0.0, "Beer-Sheva-Comparisons": 0.00431955769919778}, {"hour": "04:00", "displayHour": "04:00-05:00", "x": 4.5, "Ben-Gurion-University": 0.01417434443656, "Soroka-Medical-Center": 0.1277163736232, "Gav-Yam-High-Tech-Park": 0.06923929098966, "Beer-Sheva-Comparisons": 0.044674340386161145}, {"hour": "05:00", "displayHour": "05:00-06:00", "x": 5.5, "Ben-Gurion-University": 0.46397354122371004, "Soroka-Medical-Center": 0.39467240270028, "Gav-Yam-High-Tech-Park": 0.66931314623338, "Beer-Sheva-Comparisons": 0.1880335837544357}, {"hour": "06:00", "displayHour": "06:00-07:00", "x": 6.5, "Ben-Gurion-University": 0.65485471296952, "Soroka-Medical-Center": 3.64999951986325, "Gav-Yam-High-Tech-Park": 2.43722304283604, "Beer-Sheva-Comparisons": 1.6539267424555204}, {"hour": "07:00", "displayHour": "07:00-08:00", "x": 7.5, "Ben-Gurion-University": 5.20481927710843, "Soroka-Medical-Center": 15.43927710611982, "Gav-Yam-High-Tech-Park": 9.08419497784342, "Beer-Sheva-Comparisons": 5.423926475671224}, {"hour": "08:00", "displayHour": "08:00-09:00", "x": 8.5, "Ben-Gurion-University": 17.734939759036138, "Soroka-Medical-Center": 14.774767853884779, "Gav-Yam-High-Tech-Park": 19.46085672082717, "Beer-Sheva-Comparisons": 9.205779663021078}, {"hour": "09:00", "displayHour": "09:00-10:00", "x": 9.5, "Ben-Gurion-University": 16.64068036853295, "Soroka-Medical-Center": 9.71124576279324, "Gav-Yam-High-Tech-Park": 12.36152141802068, "Beer-Sheva-Comparisons": 8.525460026207918}, {"hour": "10:00", "displayHour": "10:00-11:00", "x": 10.5, "Ben-Gurion-University": 12.469643278998339, "Soroka-Medical-Center": 7.428675686835611, "Gav-Yam-High-Tech-Park": 6.896233382570161, "Beer-Sheva-Comparisons": 8.304036397262827}, {"hour": "11:00", "displayHour": "11:00-12:00", "x": 11.5, "Ben-Gurion-University": 8.63406567446255, "Soroka-Medical-Center": 6.967744413608989, "Gav-Yam-High-Tech-Park": 3.2957902511078196, "Beer-Sheva-Comparisons": 7.285113979729417}, {"hour": "12:00", "displayHour": "12:00-13:00", "x": 12.5, "Ben-Gurion-University": 8.25230333097094, "Soroka-Medical-Center": 5.17971518288408, "Gav-Yam-High-Tech-Park": 3.6373707533234803, "Beer-Sheva-Comparisons": 6.463224720849532}, {"hour": "13:00", "displayHour": "13:00-14:00", "x": 13.5, "Ben-Gurion-University": 7.57949444838176, "Soroka-Medical-Center": 5.4351479301305, "Gav-Yam-High-Tech-Park": 3.69276218611521, "Beer-Sheva-Comparisons": 6.897673813764839}, {"hour": "14:00", "displayHour": "14:00-15:00", "x": 14.5, "Ben-Gurion-University": 6.21497755728797, "Soroka-Medical-Center": 6.0526037815569795, "Gav-Yam-High-Tech-Park": 3.2080871491875897, "Beer-Sheva-Comparisons": 6.035749906412033}, {"hour": "15:00", "displayHour": "15:00-16:00", "x": 15.5, "Ben-Gurion-University": 3.52941176470588, "Soroka-Medical-Center": 3.9448034800311103, "Gav-Yam-High-Tech-Park": 3.93740768094534, "Beer-Sheva-Comparisons": 6.142483653036601}, {"hour": "16:00", "displayHour": "16:00-17:00", "x": 16.5, "Ben-Gurion-University": 4.24568863690054, "Soroka-Medical-Center": 4.2184814235094095, "Gav-Yam-High-Tech-Park": 6.52695716395864, "Beer-Sheva-Comparisons": 6.909946189051181}, {"hour": "17:00", "displayHour": "17:00-18:00", "x": 17.5, "Ben-Gurion-University": 2.99551145759508, "Soroka-Medical-Center": 3.60006529859704, "Gav-Yam-High-Tech-Park": 7.38552437223042, "Beer-Sheva-Comparisons": 8.729708570388874}, {"hour": "18:00", "displayHour": "18:00-19:00", "x": 18.5, "Ben-Gurion-University": 2.63737302149775, "Soroka-Medical-Center": 3.34943391878006, "Gav-Yam-High-Tech-Park": 4.47747415066469, "Beer-Sheva-Comparisons": 6.377988633962273}, {"hour": "19:00", "displayHour": "19:00-20:00", "x": 19.5, "Ben-Gurion-University": 1.6791873375856299, "Soroka-Medical-Center": 3.83149120869623, "Gav-Yam-High-Tech-Park": 3.83585672082717, "Beer-Sheva-Comparisons": 5.365199393819045}, {"hour": "20:00", "displayHour": "20:00-21:00", "x": 20.5, "Ben-Gurion-University": 0.6076068981809499, "Soroka-Medical-Center": 2.2335961281773, "Gav-Yam-High-Tech-Park": 4.14050960118168, "Beer-Sheva-Comparisons": 3.6410204850189922}, {"hour": "21:00", "displayHour": "21:00-22:00", "x": 21.5, "Ben-Gurion-University": 0.26553271911174, "Soroka-Medical-Center": 0.9602734858887799, "Gav-Yam-High-Tech-Park": 3.60505908419497, "Beer-Sheva-Comparisons": 1.681370991425147}, {"hour": "22:00", "displayHour": "22:00-23:00", "x": 22.5, "Ben-Gurion-University": 0.0822111977321, "Soroka-Medical-Center": 1.9551168172695501, "Gav-Yam-High-Tech-Park": 0.6923929098966, "Beer-Sheva-Comparisons": 0.7689702548120617}, {"hour": "23:00", "displayHour": "23:00-00:00", "x": 23.5, "Ben-Gurion-University": 0.08788093550673, "Soroka-Medical-Center": 0.36202310418007, "Gav-Yam-High-Tech-Park": 0.5862259970457899, "Beer-Sheva-Comparisons": 0.259610024308028}], "outbound": [{"hour": "00:00", "displayHour": "00:00-01:00", "x": 0.5, "Ben-Gurion-University": 0.13779826070903, "Soroka-Medical-Center": 0.30995864499131, "Gav-Yam-High-Tech-Park": 0.0604010630587, "Beer-Sheva-Comparisons": 0.3961109355689248}, {"hour": "01:00", "displayHour": "01:00-02:00", "x": 1.5, "Ben-Gurion-University": 0.07450336583789, "Soroka-Medical-Center": 0.44291459007969003, "Gav-Yam-High-Tech-Park": 0.03221390029797, "Beer-Sheva-Comparisons": 0.27156988781871266}, {"hour": "02:00", "displayHour": "02:00-03:00", "x": 2.5, "Ben-Gurion-University": 0.025713551041390004, "Soroka-Medical-Center": 0.6492817931923199, "Gav-Yam-High-Tech-Park": 0.0, "Beer-Sheva-Comparisons": 0.054621158623065595}, {"hour": "03:00", "displayHour": "03:00-04:00", "x": 3.5, "Ben-Gurion-University": 0.03626270018658, "Soroka-Medical-Center": 0.17210861603465, "Gav-Yam-High-Tech-Park": 0.0, "Beer-Sheva-Comparisons": 0.02574065623011669}, {"hour": "04:00", "displayHour": "04:00-05:00", "x": 4.5, "Ben-Gurion-University": 0.03824066565131, "Soroka-Medical-Center": 0.15661068378508, "Gav-Yam-High-Tech-Park": 0.08456148828219, "Beer-Sheva-Comparisons": 0.04571106747481115}, {"hour": "05:00", "displayHour": "05:00-06:00", "x": 5.5, "Ben-Gurion-University": 0.03560337836501, "Soroka-Medical-Center": 0.37602877721314, "Gav-Yam-High-Tech-Park": 0.0, "Beer-Sheva-Comparisons": 0.03016618472664558}, {"hour": "06:00", "displayHour": "06:00-07:00", "x": 6.5, "Ben-Gurion-University": 0.11999657152652, "Soroka-Medical-Center": 0.43965186750083, "Gav-Yam-High-Tech-Park": 0.63622453088507, "Beer-Sheva-Comparisons": 0.2952512345357914}, {"hour": "07:00", "displayHour": "07:00-08:00", "x": 7.5, "Ben-Gurion-University": 0.33559480718133, "Soroka-Medical-Center": 1.74229385710906, "Gav-Yam-High-Tech-Park": 2.995892727712, "Beer-Sheva-Comparisons": 0.9983601646857854}, {"hour": "08:00", "displayHour": "08:00-09:00", "x": 8.5, "Ben-Gurion-University": 1.09381490199181, "Soroka-Medical-Center": 2.75292217590968, "Gav-Yam-High-Tech-Park": 2.24289280824675, "Beer-Sheva-Comparisons": 2.8965537931474996}, {"hour": "09:00", "displayHour": "09:00-10:00", "x": 9.5, "Ben-Gurion-University": 3.3308938425935, "Soroka-Medical-Center": 4.97320489082114, "Gav-Yam-High-Tech-Park": 5.67769992751872, "Beer-Sheva-Comparisons": 3.59949374774534}, {"hour": "10:00", "displayHour": "10:00-11:00", "x": 10.5, "Ben-Gurion-University": 4.7873357464512, "Soroka-Medical-Center": 6.72039283179849, "Gav-Yam-High-Tech-Park": 2.7381815253281703, "Beer-Sheva-Comparisons": 4.4040077195898455}, {"hour": "11:00", "displayHour": "11:00-12:00", "x": 11.5, "Ben-Gurion-University": 7.68043989951935, "Soroka-Medical-Center": 8.0858422310497, "Gav-Yam-High-Tech-Park": 5.35958766207618, "Beer-Sheva-Comparisons": 6.378269445579042}, {"hour": "12:00", "displayHour": "12:00-13:00", "x": 12.5, "Ben-Gurion-University": 7.70615345056075, "Soroka-Medical-Center": 9.18945814334771, "Gav-Yam-High-Tech-Park": 7.17161955383748, "Beer-Sheva-Comparisons": 6.907469117591937}, {"hour": "13:00", "displayHour": "13:00-14:00", "x": 13.5, "Ben-Gurion-University": 11.37989464037291, "Soroka-Medical-Center": 8.66089708557305, "Gav-Yam-High-Tech-Park": 4.32874285254087, "Beer-Sheva-Comparisons": 7.427216503534782}, {"hour": "14:00", "displayHour": "14:00-15:00", "x": 14.5, "Ben-Gurion-University": 8.13141602547619, "Soroka-Medical-Center": 10.653604900609311, "Gav-Yam-High-Tech-Park": 4.48981235403076, "Beer-Sheva-Comparisons": 7.5741532734099195}, {"hour": "15:00", "displayHour": "15:00-16:00", "x": 15.5, "Ben-Gurion-University": 13.03347376888132, "Soroka-Medical-Center": 12.77111185428681, "Gav-Yam-High-Tech-Park": 7.155512603688489, "Beer-Sheva-Comparisons": 8.057468523849504}, {"hour": "16:00", "displayHour": "16:00-17:00", "x": 16.5, "Ben-Gurion-University": 12.690626421662671, "Soroka-Medical-Center": 8.71065360490061, "Gav-Yam-High-Tech-Park": 10.15140533140049, "Beer-Sheva-Comparisons": 9.132908186002181}, {"hour": "17:00", "displayHour": "17:00-18:00", "x": 17.5, "Ben-Gurion-University": 8.964798807946138, "Soroka-Medical-Center": 5.9357080515836405, "Gav-Yam-High-Tech-Park": 13.558025287911729, "Beer-Sheva-Comparisons": 8.693002287321573}, {"hour": "18:00", "displayHour": "18:00-19:00", "x": 18.5, "Ben-Gurion-University": 6.919582517422571, "Soroka-Medical-Center": 3.87203602045727, "Gav-Yam-High-Tech-Park": 12.39429813964725, "Beer-Sheva-Comparisons": 8.942292397619923}, {"hour": "19:00", "displayHour": "19:00-20:00", "x": 19.5, "Ben-Gurion-University": 6.44223351860276, "Soroka-Medical-Center": 3.16157817891139, "Gav-Yam-High-Tech-Park": 8.64137875493275, "Beer-Sheva-Comparisons": 8.59183806454712}, {"hour": "20:00", "displayHour": "20:00-21:00", "x": 20.5, "Ben-Gurion-University": 3.81219877234276, "Soroka-Medical-Center": 4.1355008686998795, "Gav-Yam-High-Tech-Park": 2.94757187726503, "Beer-Sheva-Comparisons": 7.599770614286575}, {"hour": "21:00", "displayHour": "21:00-22:00", "x": 21.5, "Ben-Gurion-University": 2.04389764688041, "Soroka-Medical-Center": 2.92666215323376, "Gav-Yam-High-Tech-Park": 5.92333091729081, "Beer-Sheva-Comparisons": 4.6120780049439505}, {"hour": "22:00", "displayHour": "22:00-23:00", "x": 22.5, "Ben-Gurion-University": 0.9527200321749, "Soroka-Medical-Center": 2.1729732375180397, "Gav-Yam-High-Tech-Park": 2.8227430136103697, "Beer-Sheva-Comparisons": 2.4109875518063406}, {"hour": "23:00", "displayHour": "23:00-00:00", "x": 23.5, "Ben-Gurion-University": 0.22680670662156002, "Soroka-Medical-Center": 0.9886049413933401, "Gav-Yam-High-Tech-Park": 0.5879036804381, "Beer-Sheva-Comparisons": 0.6549594793606106}]};
         
         const poiColors = {
             'Ben-Gurion-University': '#FF6B6B',
@@ -61,8 +97,10 @@
             'Beer-Sheva-Comparisons': '#96CEB4'
         };
 
-        const CustomTooltip = ({ active, payload, label }) => {
+        const CustomTooltip = ({ active, payload, label, currentTripType }) => {
             if (active && payload && payload.length) {
+                // Find the full data point to get the display hour
+                const dataPoint = temporalData[currentTripType].find(d => d.hour === label);
                 return (
                     <div style={{
                         background: '#1a1a1a',
@@ -70,7 +108,7 @@
                         padding: '8px',
                         fontSize: '0.85em'
                     }}>
-                        <p style={{ margin: '0 0 5px' }}><strong>{label}</strong></p>
+                        <p style={{ margin: '0 0 5px' }}><strong>{dataPoint.displayHour}</strong></p>
                         {payload.map((entry, index) => (
                             <p key={index} style={{ 
                                 margin: '2px 0',
@@ -86,19 +124,35 @@
         };
 
         const App = () => {
+            const [tripType, setTripType] = React.useState('inbound');
+            
             return (
                 <div className="card">
                     <h2 style={{ textAlign: 'center', marginBottom: '20px' }}>
                         Temporal Trip Patterns
                     </h2>
+                    <div className="mode-toggle">
+                        <button 
+                            className={tripType === 'inbound' ? 'active' : ''}
+                            onClick={() => setTripType('inbound')}
+                        >
+                            Inbound Trips
+                        </button>
+                        <button 
+                            className={tripType === 'outbound' ? 'active' : ''}
+                            onClick={() => setTripType('outbound')}
+                        >
+                            Outbound Trips
+                        </button>
+                    </div>
                     <ResponsiveContainer width="100%" height={400}>
                         <LineChart
-                            data={temporalData}
+                            data={temporalData[tripType]}
                             margin={{
                                 top: 5,
                                 right: 30,
                                 left: 20,
-                                bottom: 45  // Increased bottom margin further
+                                bottom: 45
                             }}
                         >
                             <CartesianGrid strokeDasharray="3 3" stroke="#333" />
@@ -110,21 +164,21 @@
                                     value: 'Hour of Day',
                                     position: 'bottom',
                                     fill: '#fff',
-                                    offset: 10  // Increased offset from x-axis
+                                    offset: 10
                                 }}
                             />
                             <YAxis
                                 stroke="#fff"
                                 tick={{ fill: '#fff' }}
                                 label={{
-                                    value: 'Trip Distribution (%)',
+                                    value: `${tripType.charAt(0).toUpperCase() + tripType.slice(1)} Trips (%)`,
                                     angle: -90,
                                     position: 'insideLeft',
                                     fill: '#fff',
                                     offset: 0
                                 }}
                             />
-                            <Tooltip content={<CustomTooltip />} />
+                            <Tooltip content={<CustomTooltip currentTripType={tripType} />} />
                             {Object.entries(poiColors).map(([poi, color]) => (
                                 <Line
                                     key={poi}
@@ -133,8 +187,16 @@
                                     stroke={color}
                                     strokeWidth={2}
                                     dot={false}
+                                    xAxisId="x"
                                 />
                             ))}
+                            <XAxis 
+                                dataKey="x"
+                                type="number"
+                                domain={[0, 23]}
+                                hide={true}
+                                xAxisId="x"
+                            />
                         </LineChart>
                     </ResponsiveContainer>
                     <div className="legend">
