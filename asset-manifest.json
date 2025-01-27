@@ -1,13 +1,13 @@
 {
   "files": {
     "main.css": "/dataviz_pages/static/css/main.717cbe28.css",
-    "main.js": "/dataviz_pages/static/js/main.e3ac6196.js",
+    "main.js": "/dataviz_pages/static/js/main.a938ab3a.js",
     "index.html": "/dataviz_pages/index.html",
     "main.717cbe28.css.map": "/dataviz_pages/static/css/main.717cbe28.css.map",
-    "main.e3ac6196.js.map": "/dataviz_pages/static/js/main.e3ac6196.js.map"
+    "main.a938ab3a.js.map": "/dataviz_pages/static/js/main.a938ab3a.js.map"
   },
   "entrypoints": [
     "static/css/main.717cbe28.css",
-    "static/js/main.e3ac6196.js"
+    "static/js/main.a938ab3a.js"
   ]
 }
