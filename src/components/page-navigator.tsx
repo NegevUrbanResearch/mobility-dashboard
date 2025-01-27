@@ -15,16 +15,17 @@ const PageNavigator: React.FC = () => {
 
   const pages: Page[] = [
     { title: 'Dataset Details', path: 'pages/dataset-details.html' },
+    { title: 'Origin Statistics', path: 'pages/origin_statistics.html' },
     { title: 'Distance Visualization', path: 'pages/merged_distance_viz.html' },
     { title: 'Walking Arc', path: 'pages/walking_arc_visualization_glow.html' },
-    { title: 'Temporal Visualization', path: 'pages/temporal_visualization.html' },
-    { title: 'Origin Statistics', path: 'pages/origin_statistics.html' },
-    { title: 'Mode Share', path: 'pages/mode_share_visualization.html' },
-    { title: 'Catchment Area', path: 'pages/catchment_dash.html' },
+    { title: 'Walking Trip Animation', path: 'pages/walking_trip_animation.html' },
+    { title: 'Mode Histograms', path: 'pages/mode_share_visualization.html' },
     { title: 'Origin Index', path: 'pages/origin-index.html' },
+    { title: 'Catchment Area', path: 'pages/catchment_dash.html' },
     { title: 'Route Intensity', path: 'pages/route_intensity_interactive.html' },
-    { title: 'Trip Animation', path: 'pages/trip_animation_time_dark_nolabels.html' },
-    { title: 'Walking Trip Animation', path: 'pages/walking_trip_animation.html' }
+    { title: 'Temporal Visualization', path: 'pages/temporal_visualization.html' },
+    { title: 'Trip Animation', path: 'pages/trip_animation_time_dark_nolabels.html' }
+    
   ];
 
   const getPagePath = (path: string): string => {
