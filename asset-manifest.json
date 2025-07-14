@@ -1,13 +1,13 @@
 {
   "files": {
-    "main.css": "/dataviz_pages/static/css/main.717cbe28.css",
-    "main.js": "/dataviz_pages/static/js/main.a938ab3a.js",
-    "index.html": "/dataviz_pages/index.html",
-    "main.717cbe28.css.map": "/dataviz_pages/static/css/main.717cbe28.css.map",
-    "main.a938ab3a.js.map": "/dataviz_pages/static/js/main.a938ab3a.js.map"
+    "main.css": "/mobility-dashboard/static/css/main.717cbe28.css",
+    "main.js": "/mobility-dashboard/static/js/main.bd9e9737.js",
+    "index.html": "/mobility-dashboard/index.html",
+    "main.717cbe28.css.map": "/mobility-dashboard/static/css/main.717cbe28.css.map",
+    "main.bd9e9737.js.map": "/mobility-dashboard/static/js/main.bd9e9737.js.map"
   },
   "entrypoints": [
     "static/css/main.717cbe28.css",
-    "static/js/main.a938ab3a.js"
+    "static/js/main.bd9e9737.js"
   ]
 }
