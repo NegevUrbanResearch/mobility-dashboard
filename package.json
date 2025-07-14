@@ -1,8 +1,8 @@
 {
-  "name": "nur-pages",
+  "name": "mobility-dashboard",
   "version": "1.0.0",
   "private": true,
-  "homepage": "https://negevurbanresearch.github.io/dataviz_pages/",
+  "homepage": "https://negevurbanresearch.github.io/mobility-dashboard/",
   "dependencies": {
     "lucide-react": "^0.263.1",
     "react": "^18.2.0",

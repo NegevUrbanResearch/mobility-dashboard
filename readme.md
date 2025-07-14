@@ -24,10 +24,10 @@ To run this project locally:
 
 ```bash
 # Clone the repository
-git clone https://github.com/NegevUrbanResearch/dataviz_pages.git
+git clone https://github.com/NegevUrbanResearch/mobility-dashboard.git
 
 # Install dependencies
-cd dataviz_pages
+cd mobility-dashboard
 npm install
 
 # Start the development server
@@ -45,4 +45,4 @@ npm run deploy
 
 ## Live Site
 
-The visualizations are available at: https://negevurbanresearch.github.io/dataviz_pages/
+The visualizations are available at: https://negevurbanresearch.github.io/mobility-dashboard/
