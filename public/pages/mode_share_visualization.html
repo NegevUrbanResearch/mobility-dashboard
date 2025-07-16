@@ -2,6 +2,8 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
     <title>Mode Share Comparison</title>
     <!-- Load React -->
     <script src="https://unpkg.com/react@17/umd/react.production.min.js"></script>
@@ -17,21 +19,76 @@
     <!-- Load Tailwind -->
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <style>
-        .recharts-legend-item-text {
-            font-size: 1rem !important;
-            color: #e5e7eb !important;
+        body {
+            zoom: 1.05;
+            margin: 0;
+            padding: 15px;
+            background: #000;
+            color: #fff;
+            min-height: 100vh;
+            box-sizing: border-box;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
-        .recharts-legend-wrapper {
-            padding: 20px !important;
+        .chart-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            max-width: 1400px;
+            padding: 2rem;
+            box-sizing: border-box;
+        }
+        .custom-legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+            padding: 20px;
+            min-height: 60px;
+            width: 100%;
+            max-width: 800px;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            font-size: 18px;
+            font-weight: 500;
+            padding: 8px 16px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+            cursor: default;
+        }
+        .legend-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            margin-right: 10px;
+            border-radius: 4px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .chart-title {
+            color: #60b5fa;
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 2rem;
+            text-align: center;
         }
     </style>
 </head>
-<body class="bg-black">
+<body>
     <div id="root"></div>
     <script type="text/babel">
         // Wait for Recharts to load completely
         window.onload = function() {
-            const { BarChart, CartesianGrid, XAxis, YAxis, Tooltip, Legend, Bar, ReferenceLine } = Recharts;
+            const { BarChart, CartesianGrid, XAxis, YAxis, Tooltip, Bar, ReferenceLine } = Recharts;
             
             const ModeShareChart = () => {
                 const data = [
@@ -58,29 +115,37 @@
                     }
                 ];
 
+                const modeColors = {
+                    'Car': '#3b82f6',
+                    'Bus': '#10b981', 
+                    'Walk': '#ec4899',
+                    'Train': '#8b5cf6'
+                };
+
                 return (
-                    <div className="bg-black p-4 flex flex-col items-center">
-                        <h2 className="text-gray-100 text-2xl font-bold mb-8">Mode Share by Destination</h2>
+                    <div className="chart-container">
+                        <h2 className="chart-title">Mode Share by Destination</h2>
                         <BarChart
-                            width={800}
-                            height={400}
+                            width={1200}
+                            height={550}
                             data={data}
                             margin={{
-                                top: 20,
-                                right: 120,
-                                left: 20,
-                                bottom: 60,
+                                top: 25,
+                                right: 160,
+                                left: 40,
+                                bottom: 15,
                             }}
                         >
                             <CartesianGrid strokeDasharray="3 3" stroke="#333" />
                             <XAxis 
                                 dataKey="name" 
-                                stroke="#e5e7eb"
-                                tick={{fill: '#e5e7eb', fontSize: 14}}
+                                stroke="#60b5fa"
+                                tick={{fill: '#60b5fa', fontSize: 20, dy: 5}}
                             />
+
                             <YAxis 
-                                stroke="#e5e7eb"
-                                tick={{fill: '#e5e7eb', fontSize: 14}}
+                                stroke="#60b5fa"
+                                tick={{fill: '#60b5fa', fontSize: 20, dx:-5}}
                                 tickFormatter={(value) => `${value}%`}
                             />
                             <Tooltip 
@@ -88,32 +153,33 @@
                                     backgroundColor: '#111', 
                                     border: '1px solid #333',
                                     borderRadius: '4px',
-                                    color: '#e5e7eb'
+                                    color: '#e5e7eb',
+                                    fontSize: '16px'
                                 }}
                                 formatter={(value) => [`${value}%`]}
-                            />
-                            <Legend 
-                                verticalAlign="bottom" 
-                                height={60}
-                                wrapperStyle={{
-                                    paddingTop: '20px',
-                                    width: '100%',
-                                    justifyContent: 'center'
-                                }}
                             />
                             <Bar dataKey="Car" fill="#3b82f6" />
                             <Bar dataKey="Bus" fill="#10b981" />
                             <Bar dataKey="Walk" fill="#ec4899" />
                             <Bar dataKey="Train" fill="#8b5cf6" />
                             <ReferenceLine y={68.76} stroke="#3b82f6" strokeDasharray="5 5" 
-                                label={{ value: 'Car Avg', fill: '#3b82f6', position: 'right', offset: 10 }} />
+                                label={{ value: 'Car Avg', fill: '#3b82f6', position: 'right', offset: 15, fontSize: 18 }} />
                             <ReferenceLine y={20.31} stroke="#10b981" strokeDasharray="5 5" 
-                                label={{ value: 'Bus Avg', fill: '#10b981', position: 'right', offset: 10 }} />
+                                label={{ value: 'Bus Avg', fill: '#10b981', position: 'right', offset: 15, fontSize: 18 }} />
                             <ReferenceLine y={10.38} stroke="#ec4899" strokeDasharray="5 5" 
-                                label={{ value: 'Walk Avg', fill: '#ec4899', position: 'right', offset: 10 }} />
+                                label={{ value: 'Walk Avg', fill: '#ec4899', position: 'right', offset: 15, fontSize: 18 }} />
                             <ReferenceLine y={0.91} stroke="#8b5cf6" strokeDasharray="5 5" 
-                                label={{ value: 'Train Avg', fill: '#8b5cf6', position: 'right', offset: 10 }} />
+                                label={{ value: 'Train Avg', fill: '#8b5cf6', position: 'right', offset: 15, fontSize: 18 }} />
                         </BarChart>
+                        
+                        <div className="custom-legend">
+                            {Object.entries(modeColors).map(([mode, color]) => (
+                                <div key={mode} className="legend-item">
+                                    <div className="legend-color" style={{ backgroundColor: color }}></div>
+                                    <span>{mode}</span>
+                                </div>
+                            ))}
+                        </div>
                     </div>
                 );
             };
