@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 interface Page {
   title: string;
@@ -12,6 +12,16 @@ const PageNavigator: React.FC = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [loadingProgress, setLoadingProgress] = useState<number>(0);
   const [isMenuVisible, setIsMenuVisible] = useState<boolean>(true);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const isDragging = useRef<boolean>(false);
+  const hasMovedThreshold = useRef<boolean>(false);
+  const startX = useRef<number>(0);
+  const startY = useRef<number>(0);
+  const scrollLeft = useRef<number>(0);
+  const velocity = useRef<number>(0);
+  const lastX = useRef<number>(0);
+  const lastTime = useRef<number>(0);
+  const animationId = useRef<number | null>(null);
 
   const pages: Page[] = [
     { title: 'Dataset Details', path: 'pages/dataset-details.html' },
@@ -25,7 +35,6 @@ const PageNavigator: React.FC = () => {
     { title: 'Route Intensity', path: 'pages/route_intensity_interactive.html' },
     { title: 'Temporal Visualization', path: 'pages/temporal_visualization.html' },
     { title: 'Trip Animation', path: 'pages/trip_animation_time_dark_nolabels.html' }
-    
   ];
 
   const getPagePath = (path: string): string => {
@@ -34,6 +43,149 @@ const PageNavigator: React.FC = () => {
 
   useEffect(() => {
     goToPage(0);
+  }, []);
+
+  // Smooth scroll active button into view when currentPage changes
+  useEffect(() => {
+    if (scrollContainerRef.current && !isDragging.current) {
+      const activeButton = scrollContainerRef.current.children[currentPage] as HTMLElement;
+      if (activeButton) {
+        activeButton.scrollIntoView({
+          behavior: 'smooth',
+          block: 'nearest',
+          inline: 'center'
+        });
+      }
+    }
+  }, [currentPage]);
+
+  // Enhanced smooth drag scrolling
+  const handleMouseDown = (e: React.MouseEvent) => {
+    // Only start drag on container, not on buttons
+    if ((e.target as HTMLElement).tagName === 'BUTTON') return;
+    if (!scrollContainerRef.current) return;
+    
+    // Cancel any ongoing momentum animation
+    if (animationId.current) {
+      cancelAnimationFrame(animationId.current);
+      animationId.current = null;
+    }
+    
+    isDragging.current = true;
+    hasMovedThreshold.current = false;
+    startX.current = e.pageX;
+    startY.current = e.pageY;
+    scrollLeft.current = scrollContainerRef.current.scrollLeft;
+    lastX.current = e.pageX;
+    lastTime.current = performance.now(); // Use high-resolution timer
+    velocity.current = 0;
+    
+    scrollContainerRef.current.style.cursor = 'grabbing';
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!isDragging.current || !scrollContainerRef.current) return;
+    
+    const deltaX = Math.abs(e.pageX - startX.current);
+    const deltaY = Math.abs(e.pageY - startY.current);
+    
+    // Only start actual dragging if moved more than threshold and more horizontal than vertical
+    if (!hasMovedThreshold.current) {
+      if (deltaX > 3 && deltaX > deltaY * 1.5) { // More sensitive threshold
+        hasMovedThreshold.current = true;
+        scrollContainerRef.current.style.scrollBehavior = 'auto';
+        scrollContainerRef.current.style.userSelect = 'none';
+      } else if (deltaY > deltaX) {
+        // More vertical movement, cancel drag
+        isDragging.current = false;
+        scrollContainerRef.current.style.cursor = 'grab';
+        return;
+      } else {
+        return;
+      }
+    }
+    
+    if (hasMovedThreshold.current) {
+      e.preventDefault();
+      const currentTime = performance.now();
+      const walk = (startX.current - e.pageX);
+      
+      // Smooth velocity calculation with better damping
+      const deltaMove = e.pageX - lastX.current;
+      const deltaTime = currentTime - lastTime.current;
+      if (deltaTime > 0) {
+        const newVelocity = deltaMove / deltaTime;
+        velocity.current = velocity.current * 0.8 + newVelocity * 0.2; // Smooth velocity
+      }
+      
+      scrollContainerRef.current.scrollLeft = scrollLeft.current + walk;
+      lastX.current = e.pageX;
+      lastTime.current = currentTime;
+    }
+  };
+
+  // Enhanced momentum with smooth easing
+  const applyMomentum = () => {
+    if (!scrollContainerRef.current || Math.abs(velocity.current) < 0.05) {
+      if (scrollContainerRef.current) {
+        scrollContainerRef.current.style.scrollBehavior = 'smooth';
+      }
+      animationId.current = null;
+      return;
+    }
+    
+    // Apply momentum with gentle deceleration
+    scrollContainerRef.current.scrollLeft -= velocity.current * 16;
+    velocity.current *= 0.94; // Gentler decay
+    
+    // Continue animation
+    animationId.current = requestAnimationFrame(applyMomentum);
+  };
+
+  const handleMouseUp = () => {
+    if (!scrollContainerRef.current) return;
+    
+    const wasDragging = isDragging.current && hasMovedThreshold.current;
+    isDragging.current = false;
+    hasMovedThreshold.current = false;
+    scrollContainerRef.current.style.cursor = 'grab';
+    scrollContainerRef.current.style.userSelect = 'auto';
+    
+    if (wasDragging) {
+      // Apply momentum only if we actually dragged with sufficient velocity
+      if (Math.abs(velocity.current) > 0.1) {
+        animationId.current = requestAnimationFrame(applyMomentum);
+      } else {
+        scrollContainerRef.current.style.scrollBehavior = 'smooth';
+      }
+    } else {
+      scrollContainerRef.current.style.scrollBehavior = 'smooth';
+    }
+  };
+
+  const handleMouseLeave = () => {
+    if (!scrollContainerRef.current) return;
+    
+    // Clean up drag state
+    if (isDragging.current && hasMovedThreshold.current && Math.abs(velocity.current) > 0.1) {
+      // Apply momentum if we were dragging
+      animationId.current = requestAnimationFrame(applyMomentum);
+    }
+    
+    isDragging.current = false;
+    hasMovedThreshold.current = false;
+    scrollContainerRef.current.style.cursor = 'grab';
+    scrollContainerRef.current.style.userSelect = 'auto';
+    scrollContainerRef.current.style.scrollBehavior = 'smooth';
+  };
+
+  // Cleanup animation on unmount
+  useEffect(() => {
+    return () => {
+      if (animationId.current) {
+        cancelAnimationFrame(animationId.current);
+      }
+    };
   }, []);
 
   // Preload next page
@@ -97,16 +249,17 @@ const PageNavigator: React.FC = () => {
     border: 'none',
     borderRadius: '8px',
     cursor: 'pointer',
-    transition: 'all 0.2s ease',
+    transition: 'all 0.3s ease',
     transform: isActive ? 'scale(1.05)' : 'scale(1)',
     boxShadow: isActive 
       ? '0 4px 12px rgba(37, 99, 235, 0.3)' 
       : '0 2px 4px rgba(37, 99, 235, 0.1)',
     outline: 'none',
+    flexShrink: 0,
   });
 
   const buttonHoverStyle = {
-    backgroundColor: '#3b82f6', // Lighter blue on hover
+    backgroundColor: '#3b82f6',
     boxShadow: '0 4px 12px rgba(37, 99, 235, 0.2)',
     transform: 'scale(1.02)',
   };
@@ -190,25 +343,33 @@ const PageNavigator: React.FC = () => {
         position: 'relative'
       }}>
         <div 
-          className="scrollable-menu"
+          className="smooth-navigation-slider"
+          ref={scrollContainerRef}
+          onMouseDown={handleMouseDown}
+          onMouseMove={handleMouseMove}
+          onMouseUp={handleMouseUp}
+          onMouseLeave={handleMouseLeave}
           style={{ 
             width: '100%',
             height: '100px',
             overflowX: 'auto',
             overflowY: 'hidden',
-            whiteSpace: 'nowrap',
             display: 'flex',
             alignItems: 'center',
             padding: '0 24px',
-            msOverflowStyle: 'none',
-            scrollbarWidth: 'none',
-            WebkitOverflowScrolling: 'touch'
+            scrollBehavior: 'smooth',
+            scrollSnapType: 'x proximity',
+            gap: '0',
+            cursor: 'grab',
           }}>
           {pages.map((page, index) => (
             <button
               key={index}
               onClick={() => goToPage(index)}
-              style={buttonStyle(currentPage === index)}
+              style={{
+                ...buttonStyle(currentPage === index),
+                scrollSnapAlign: 'center',
+              }}
               onMouseEnter={(e) => {
                 const btn = e.target as HTMLElement;
                 Object.assign(btn.style, buttonHoverStyle);

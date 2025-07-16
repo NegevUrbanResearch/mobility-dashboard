@@ -36,7 +36,65 @@ html, body, #root {
     height: 100%;
   }
 
-  /* Scrollable menu styles */
+  /* Smooth navigation slider */
+  .smooth-navigation-slider {
+    scrollbar-width: thin;
+    scrollbar-color: #3b82f6 #1e293b;
+    -webkit-overflow-scrolling: touch; /* Enable momentum scrolling on iOS */
+    scroll-padding: 24px;
+  }
+
+  .smooth-navigation-slider::-webkit-scrollbar {
+    height: 6px;
+  }
+
+  .smooth-navigation-slider::-webkit-scrollbar-track {
+    background: #1e293b;
+    border-radius: 3px;
+  }
+
+  .smooth-navigation-slider::-webkit-scrollbar-thumb {
+    background: #3b82f6;
+    border-radius: 3px;
+    transition: background-color 0.2s ease;
+  }
+
+  .smooth-navigation-slider::-webkit-scrollbar-thumb:hover {
+    background: #2563eb;
+  }
+
+  .smooth-navigation-slider::-webkit-scrollbar-thumb:active {
+    background: #1d4ed8;
+  }
+
+  /* Fade indicators for better UX */
+  .smooth-navigation-slider::before {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 6px;
+    width: 20px;
+    background: linear-gradient(to left, #0f172a, transparent);
+    pointer-events: none;
+    z-index: 10;
+    opacity: 0.7;
+  }
+
+  .smooth-navigation-slider::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 6px;
+    width: 20px;
+    background: linear-gradient(to right, #0f172a, transparent);
+    pointer-events: none;
+    z-index: 10;
+    opacity: 0.7;
+  }
+
+  /* Legacy scrollable menu styles (keeping for compatibility) */
   .scrollable-menu {
     -ms-overflow-style: none;  /* IE and Edge */
     scrollbar-width: none;  /* Firefox */
@@ -105,4 +163,20 @@ html, body, #root {
   .loading-progress-text {
     color: white;
     font-size: 14px;
+  }
+
+  /* Smooth scrolling for the entire document */
+  html {
+    scroll-behavior: smooth;
+  }
+
+  /* Better focus styles for accessibility */
+  .smooth-navigation-slider button:focus {
+    outline: 2px solid #3b82f6;
+    outline-offset: 2px;
+  }
+
+  /* Simple button styling */
+  .smooth-navigation-slider button {
+    transition: all 0.3s ease;
   }
