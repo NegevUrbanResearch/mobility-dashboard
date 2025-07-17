@@ -3,6 +3,7 @@
 <head>
     <title>Trip Distance Distribution Analysis</title>
     <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- Core React -->
     <script src="https://unpkg.com/react@17.0.2/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@17.0.2/umd/react-dom.development.js"></script>
@@ -12,97 +13,166 @@
     <!-- Babel -->
     <script src="https://unpkg.com/@babel/standalone@7.23.6/babel.min.js"></script>
     <style>
-        body {
+        * {
             margin: 0;
-            zoom: 1.1;
-            padding: 20px;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
-            background: #111;
-            color: #fff;
+            padding: 0;
+            box-sizing: border-box;
         }
-        .card {
-            background: #1a1a1a;
-            border-radius: 8px;
-            padding: 20px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            max-width: 900px;
-            margin: 0 auto;
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0a0a0a;
+            color: #ffffff;
+            height: 100vh;
+            overflow: hidden;
         }
-        .selector-group {
-            margin-bottom: 20px;
-            padding: 15px;
-            background: #222;
-            border-radius: 8px;
+        
+        .app {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding: 40px;
+            gap: 30px;
         }
-        .selector-label {
-            display: block;
-            margin-bottom: 10px;
-            color: #999;
-            font-size: 14px;
+        
+        .title {
+            font-size: 56px;
+            font-weight: 300;
+            text-align: center;
+            color: #60a5fa;
+            letter-spacing: -0.5px;
         }
-        #error-message {
-            background: #ff000033;
-            color: #ff6b6b;
+        
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 100px;
+            align-items: center;
+        }
+        
+        .control-section {
+            text-align: center;
+            border: 1px solid #334155;
             padding: 10px;
-            border-radius: 4px;
-            margin: 10px 0;
-            display: none;
+            border-radius: 8px;
+            background-color: #0a0a0a
+        }
+        
+        .control-label {
+            font-size: 20px;
+            color: #7dd3fc;
+            margin-bottom: 18px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 500;
+        }
+        
+        .buttons {
+            display: flex;
+            gap: 12px;
+        }
+        
+        .btn {
+            padding: 14px 28px;
+            background: none;
+            border: none;
+            color: #ede8e8;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: 500;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+        }
+        
+        .btn:hover {
+            color: #94a3b8;
+            background: rgba(96, 165, 250, 0.05);
+        }
+        
+        .btn.active {
+            color: #60a5fa;
+            background: rgba(96, 165, 250, 0.12);
+        }
+        
+        .chart-area {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 0;
         }
         .loading {
-            color: #fff;
-            text-align: center;
-            padding: 20px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #0a0a0a;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        
+        .spinner {
+            width: 32px;
+            height: 32px;
+            border: 2px solid #222;
+            border-top: 2px solid #666;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        #error-message {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #2a1a1a;
+            color: #ff6b6b;
+            padding: 16px 20px;
+            border-radius: 6px;
+            font-size: 15px;
+            display: none;
+            z-index: 1000;
         }
     </style>
-    <link rel="stylesheet" href="../css/loading-screen.css">
 </head>
 <body>
     <div id="error-message"></div>
     <div id="root">
-        <div class="loading">Loading visualization...</div>
+        <div class="loading">
+            <div class="spinner"></div>
+        </div>
     </div>
+    
     <script>
-        // Global error handler
         window.onerror = function(msg, url, lineNo, columnNo, error) {
             const errorDiv = document.getElementById('error-message');
             errorDiv.style.display = 'block';
-            errorDiv.innerHTML = `<strong>Error:</strong> ${msg}<br>
-                                <small>Line: ${lineNo}, Column: ${columnNo}</small>`;
+            errorDiv.textContent = `Error: ${msg}`;
             console.error('Error:', error);
             return false;
         };
     </script>
+    
     <script type="text/babel">
-        // Wait for all dependencies to load
-        const checkDependencies = () => {
-            return new Promise((resolve, reject) => {
-                const interval = setInterval(() => {
-                    if (window.Recharts) {
-                        clearInterval(interval);
-                        resolve();
-                    }
-                }, 100);
-
-                // Timeout after 5 seconds
-                setTimeout(() => {
-                    clearInterval(interval);
-                    reject(new Error('Timeout loading dependencies'));
-                }, 5000);
-            });
-        };
-
         const allData = {"bgu": {"walk": [{"range": "0-0.5", "trips": 171.95387938230078}, {"range": "0.5-1", "trips": 243.09826136660882}, {"range": "1-2", "trips": 213.9685504808279}, {"range": "2-3", "trips": 3.0223880597014925}, {"range": ">3", "trips": 8.026030368763557}], "bike": [{"range": "0-1", "trips": 17.777131214999095}, {"range": "1-2", "trips": 49.770575299176826}, {"range": "2-3", "trips": 18.974905018900206}, {"range": "3-5", "trips": 23.52105658347527}, {"range": ">5", "trips": 0.0}], "car": [{"range": "0-10", "trips": 4325.254275614954}, {"range": "10-25", "trips": 743.0189776297474}, {"range": "25-50", "trips": 1188.387808639727}, {"range": "50-75", "trips": 838.4064901029683}, {"range": ">75", "trips": 2708.470700232167}], "transit": [{"range": "0-10", "trips": 1124.6329466102923}, {"range": "10-25", "trips": 256.9810223702527}, {"range": "25-50", "trips": 711.612191360273}, {"range": "50-75", "trips": 561.5935098970315}, {"range": ">75", "trips": 1591.529299767833}]}, "soroka_hospital": {"walk": [{"range": "0-0.5", "trips": 167.8193257334952}, {"range": "0.5-1", "trips": 177.2963794602383}, {"range": "1-2", "trips": 150.71221687381112}, {"range": "2-3", "trips": 17.624356775300175}, {"range": ">3", "trips": 4.749787955894826}], "bike": [{"range": "0-1", "trips": 9.009920949643497}, {"range": "1-2", "trips": 25.937853525692447}, {"range": "2-3", "trips": 16.47858327528171}, {"range": "3-5", "trips": 7.9369131259153765}, {"range": ">5", "trips": 0.0}], "car": [{"range": "0-10", "trips": 4837.422822935778}, {"range": "10-25", "trips": 1884.3653485368197}, {"range": "25-50", "trips": 2281.067016935276}, {"range": "50-75", "trips": 790.1440799656167}, {"range": ">75", "trips": 3141.173379494267}], "transit": [{"range": "0-10", "trips": 1085.0118393889493}, {"range": "10-25", "trips": 615.6346514631801}, {"range": "25-50", "trips": 918.9329830647241}, {"range": "50-75", "trips": 809.8559200343834}, {"range": ">75", "trips": 2058.8266205057334}]}, "gev_yam": {"walk": [{"range": "0-0.5", "trips": 29.213483146067414}, {"range": "0.5-1", "trips": 243.50360565707427}, {"range": "1-2", "trips": 77.56128024980485}, {"range": "2-3", "trips": 19.014084507042256}, {"range": ">3", "trips": 0.0}], "bike": [{"range": "0-1", "trips": 2.3166023166023164}, {"range": "1-2", "trips": 0.0}, {"range": "2-3", "trips": 0.0}, {"range": "3-5", "trips": 11.422413793103448}, {"range": ">5", "trips": 0.0}], "car": [{"range": "0-10", "trips": 4610.956452821554}, {"range": "10-25", "trips": 659.5888120873489}, {"range": "25-50", "trips": 925.3210876390584}, {"range": "50-75", "trips": 1179.4774481438412}, {"range": ">75", "trips": 2610.565984341733}], "transit": [{"range": "0-10", "trips": 606.0120775087515}, {"range": "10-25", "trips": 140.41118791265114}, {"range": "25-50", "trips": 574.6789123609416}, {"range": "50-75", "trips": 120.52255185615896}, {"range": ">75", "trips": 389.43401565826707}]}};
         
         const modeColors = {
-            walk: '#45B7D1',
-            bike: '#96CEB4',
-            car: '#FF6B6B',
-            transit: '#4ECDC4'
+            walk: '#4ade80',
+            bike: '#60a5fa',
+            car: '#f87171',
+            transit: '#a78bfa'
         };
 
         const modeNames = {
-            walk: 'Walking',
-            bike: 'Biking',
+            walk: 'Walk',
+            bike: 'Bike',
             car: 'Car',
             transit: 'Transit'
         };
@@ -132,22 +202,21 @@
                 return (
                     <div style={{
                         background: '#1a1a1a',
-                        border: '1px solid #333',
-                        padding: '10px',
-                        borderRadius: '4px'
+                        padding: '14px 18px',
+                        borderRadius: '8px',
+                        fontSize: '16px',
+                        boxShadow: '0 4px 12px rgba(0,0,0,0.4)',
+                        border: '1px solid #334155'
                     }}>
-                        <p style={{color: '#fff', margin: '0 0 5px'}}>
-                            Distance: {label} km
-                        </p>
-                        <p style={{color: '#fff', margin: '0 0 5px'}}>
-                            Trips: {payload[0].payload.trips}
-                        </p>
-                        <p style={{color: '#fff', margin: '0 0 5px'}}>
-                            Percentage: {payload[0].payload.percentage}%
-                        </p>
-                        <p style={{color: '#fff', margin: '0'}}>
+                        <div style={{color: '#60a5fa', marginBottom: '8px', fontWeight: '500'}}>
+                            {label} km
+                        </div>
+                        <div style={{color: '#94a3b8', marginBottom: '6px'}}>
+                            {Math.round(payload[0].payload.trips)} trips ({payload[0].payload.percentage}%)
+                        </div>
+                        <div style={{color: '#64748b', fontSize: '15px'}}>
                             Cumulative: {payload[0].payload.cumulative}%
-                        </p>
+                        </div>
                     </div>
                 );
             }
@@ -158,17 +227,13 @@
             const [selectedLocation, setSelectedLocation] = React.useState('bgu');
             const [selectedMode, setSelectedMode] = React.useState('walk');
             const [isLoading, setIsLoading] = React.useState(true);
-            const [loadingProgress, setLoadingProgress] = React.useState(0);
 
             React.useEffect(() => {
-                // Check dependencies with progress
                 const checkDeps = async () => {
                     try {
-                        setLoadingProgress(30);
-                        await new Promise(resolve => setTimeout(resolve, 300));
+                        await new Promise(resolve => setTimeout(resolve, 500));
                         
                         if (!window.Recharts) {
-                            setLoadingProgress(60);
                             await new Promise((resolve, reject) => {
                                 const interval = setInterval(() => {
                                     if (window.Recharts) {
@@ -184,9 +249,6 @@
                             });
                         }
                         
-                        setLoadingProgress(90);
-                        await new Promise(resolve => setTimeout(resolve, 300));
-                        setLoadingProgress(100);
                         setIsLoading(false);
                     } catch (err) {
                         console.error('Loading error:', err);
@@ -200,164 +262,125 @@
             }, []);
 
             if (isLoading) {
-                return (
-                    <div className="loading-screen">
-                        <div className="loading-spinner-container">
-                            <div className="loading-spinner-bg"></div>
-                            <div className="loading-spinner"></div>
-                        </div>
-                        <div className="loading-progress-container">
-                            <div className="loading-progress-bg">
-                                <div 
-                                    className="loading-progress-fill"
-                                    style={{ width: `${loadingProgress}%` }}
-                                />
-                            </div>
-                            <div className="loading-progress-text">
-                                Loading visualization... {Math.round(loadingProgress)}%
-                            </div>
-                        </div>
-                    </div>
-                );
+                return null;
             }
 
             const {
                 ComposedChart, Bar, Line, XAxis, YAxis,
-                CartesianGrid, Tooltip
+                CartesianGrid, Tooltip, ResponsiveContainer
             } = window.Recharts;
 
             const currentData = allData[selectedLocation]?.[selectedMode] || [];
             const processedData = processData(currentData);
 
             return (
-                <div className="card">
-                    <h2 style={{
-                        color: '#fff',
-                        marginTop: 0,
-                        marginBottom: '20px',
-                        textAlign: 'center',
-                        fontSize: '32px'
-                    }}>
-                        Trip Distance Distribution Analysis
-                    </h2>
+                <div className="app">
+                    <h1 className="title">Trip Distance Distribution</h1>
                     
-                    <div className="selector-group">
-                        <span className="selector-label">Location:</span>
-                        <div style={{
-                            display: 'flex',
-                            gap: '10px',
-                            marginBottom: '15px'
-                        }}>
-                            {Object.entries(locationNames).map(([key, name]) => (
-                                <button
-                                    key={key}
-                                    onClick={() => setSelectedLocation(key)}
-                                    style={{
-                                        padding: '8px 16px',
-                                        borderRadius: '6px',
-                                        border: 'none',
-                                        background: selectedLocation === key ? '#333' : '#222',
-                                        color: selectedLocation === key ? '#fff' : '#999',
-                                        cursor: 'pointer',
-                                        transition: 'all 0.2s'
-                                    }}
-                                >
-                                    {name}
-                                </button>
-                            ))}
+                    <div className="controls">
+                        <div className="control-section">
+                            <div className="control-label">Location</div>
+                            <div className="buttons">
+                                {Object.entries(locationNames).map(([key, name]) => (
+                                    <button
+                                        key={key}
+                                        onClick={() => setSelectedLocation(key)}
+                                        className={`btn ${selectedLocation === key ? 'active' : ''}`}
+                                    >
+                                        {name}
+                                    </button>
+                                ))}
+                            </div>
                         </div>
 
-                        <span className="selector-label">Transport Mode:</span>
-                        <div style={{
-                            display: 'flex',
-                            gap: '10px'
-                        }}>
-                            {Object.entries(modeNames).map(([mode, name]) => (
-                                <button
-                                    key={mode}
-                                    onClick={() => setSelectedMode(mode)}
-                                    style={{
-                                        padding: '8px 16px',
-                                        borderRadius: '6px',
-                                        border: 'none',
-                                        background: selectedMode === mode ? '#333' : '#222',
-                                        color: selectedMode === mode ? modeColors[mode] : '#999',
-                                        cursor: 'pointer',
-                                        transition: 'all 0.2s'
-                                    }}
-                                >
-                                    {name}
-                                </button>
-                            ))}
+                        <div className="control-section">
+                            <div className="control-label">Mode</div>
+                            <div className="buttons">
+                                {Object.entries(modeNames).map(([mode, name]) => (
+                                    <button
+                                        key={mode}
+                                        onClick={() => setSelectedMode(mode)}
+                                        className={`btn ${selectedMode === mode ? 'active' : ''}`}
+                                        style={{
+                                            color: selectedMode === mode ? modeColors[mode] : '#ede8e8'
+                                        }}
+                                    >
+                                        {name}
+                                    </button>
+                                ))}
+                            </div>
                         </div>
                     </div>
 
-                    <div style={{height: '400px'}}>
-                        <ComposedChart
-                            width={800}
-                            height={400}
-                            data={processedData}
-                            margin={{
-                                top: 20,
-                                right: 30,
-                                left: 20,
-                                bottom: 5
-                            }}
-                        >
-                            <CartesianGrid
-                                strokeDasharray="3 3"
-                                stroke="#333"
-                                vertical={false}
-                            />
-                            <XAxis
-                                dataKey="range"
-                                stroke="#999"
-                                label={{
-                                    value: 'Distance (km)',
-                                    position: 'bottom',
-                                    fill: '#999'
-                                }}
-                                tickFormatter={value => `${value} km`}
-                            />
-                            <YAxis
-                                stroke="#999"
-                                tickFormatter={value => `${value}%`}
-                            />
-                            <Tooltip content={<CustomTooltip />} />
-                            <Bar
-                                dataKey="percentage"
-                                fill={modeColors[selectedMode]}
-                                radius={[4, 4, 0, 0]}
-                                maxBarSize={80}
-                            />
-                            <Line
-                                type="monotone"
-                                dataKey="cumulative"
-                                stroke="#fff"
-                                strokeWidth={2}
-                                dot={false}
-                                opacity={0.6}
-                            />
-                        </ComposedChart>
-                    </div>
-                    <div style={{
-                        textAlign: 'center',
-                        color: '#666',
-                        marginTop: '10px',
-                        fontSize: '18px'
-                    }}>
-                        Bars show distribution percentage, line shows cumulative percentage
+                    <div className="chart-area">
+                        <ResponsiveContainer width="95%" height="95%">
+                            <ComposedChart
+                                data={processedData}
+                                margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
+                            >
+                                <CartesianGrid
+                                    strokeDasharray="1 3"
+                                    stroke="#334155"
+                                    vertical={false}
+                                />
+                                <XAxis
+                                    dataKey="range"
+                                    stroke="#64748b"
+                                    fontSize={15}
+                                    tickLine={false}
+                                    axisLine={false}
+                                    tickFormatter={value => `${value} km`}
+                                />
+                                <YAxis
+                                    stroke="#64748b"
+                                    fontSize={15}
+                                    tickLine={false}
+                                    axisLine={false}
+                                    tickFormatter={value => `${value}%`}
+                                />
+                                <Tooltip content={<CustomTooltip />} />
+                                <Bar
+                                    dataKey="percentage"
+                                    fill={modeColors[selectedMode]}
+                                    radius={[2, 2, 0, 0]}
+                                    fillOpacity={0.9}
+                                />
+                                <Line
+                                    type="monotone"
+                                    dataKey="cumulative"
+                                    stroke="#7dd3fc"
+                                    strokeWidth={1.5}
+                                    dot={false}
+                                    strokeOpacity={0.8}
+                                />
+                            </ComposedChart>
+                        </ResponsiveContainer>
                     </div>
                 </div>
             );
         };
 
-        ReactDOM.render(
-            <React.StrictMode>
-                <App />
-            </React.StrictMode>,
-            document.getElementById('root')
-        );
+        const checkDependencies = () => {
+            return new Promise((resolve, reject) => {
+                const interval = setInterval(() => {
+                    if (window.Recharts) {
+                        clearInterval(interval);
+                        resolve();
+                    }
+                }, 100);
+
+                setTimeout(() => {
+                    clearInterval(interval);
+                    reject(new Error('Timeout loading dependencies'));
+                }, 5000);
+            });
+        };
+
+        checkDependencies().then(() => {
+            ReactDOM.render(<App />, document.getElementById('root'));
+        }).catch(err => {
+            console.error('Failed to load dependencies:', err);
+        });
     </script>
 </body>
 </html>
