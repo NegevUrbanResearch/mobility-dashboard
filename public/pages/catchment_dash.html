@@ -250,8 +250,8 @@
     <div id="map"></div>
     <div id="fade-overlay"></div>
 
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" />
-    <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
+    <link href="https://unpkg.com/maplibre-gl@2.4.0/dist/maplibre-gl.css" rel="stylesheet" />
+    <script src="https://unpkg.com/maplibre-gl@2.4.0/dist/maplibre-gl.js"></script>
     <script>
         // Embed all catchment data
         const catchmentData = {"BGU": {"bounds": [34.56924526959899, 30.626897276099523, 35.23037222384999, 32.08433076700184], "center": [31.262218, 34.801472], "modes": {"bike": {"area": 0.00043076861712205516, "color": "#96CEB4", "geometry": {"coordinates": [[[34.79208041171158, 31.246261130607387], [34.79053802186049, 31.25570386782518], [34.789018661625015, 31.26900963818322], [34.79772798039277, 31.282798359733942], [34.80343150264815, 31.270971603347977], [34.80722070877522, 31.258752488286703], [34.796202066602255, 31.242561196578688], [34.79208041171158, 31.246261130607387]]], "type": "Polygon"}}, "car": {"area": 0.16260261278910582, "color": "#FF6B6B", "geometry": {"coordinates": [[[34.70388839889864, 31.024658616306798], [34.56924526959899, 31.4290822167143], [34.595820188907915, 31.528766637038455], [34.960754975055174, 31.328038020252706], [35.085628870746575, 31.24168476541378], [35.0464079512308, 31.07108801793993], [34.91939925788987, 30.989394885254907], [34.70388839889864, 31.024658616306798]]], "type": "Polygon"}}, "transit": {"area": 0.607801193157301, "color": "#4ECDC4", "geometry": {"coordinates": [[[34.614323083065585, 31.316105052552842], [34.57100206646957, 31.664668817282678], [34.792458392693646, 32.08433076700184], [34.874039985719584, 32.062202296775865], [34.9517090318422, 31.999228687251215], [35.20522194466407, 31.7788171713412], [35.23037222384999, 31.285532220016325], [35.22367135812832, 31.249922505474558], [34.817721005694146, 30.626897276099523], [34.614323083065585, 31.316105052552842]]], "type": "Polygon"}}, "walk": {"area": 0.00034577361819262715, "color": "#FFE66D", "geometry": {"coordinates": [[[34.79053802186049, 31.25570386782518], [34.79130442045332, 31.260082830705162], [34.793560913507974, 31.272781818746274], [34.80343150264815, 31.270971603347977], [34.8135047672524, 31.264721198572644], [34.80574828902443, 31.249354876022387], [34.79053802186049, 31.25570386782518]]], "type": "Polygon"}}}}, "Gev_Yam": {"bounds": [34.57100206646957, 30.626897276099523, 35.23037222384999, 31.92226178996439], "center": [31.2635, 34.8035], "modes": {"car": {"area": 0.5699870305725597, "color": "#FF6B6B", "geometry": {"coordinates": [[[34.574232913264595, 31.41673960326309], [34.57100206646957, 31.664668817282678], [34.65980289913556, 31.80878619333203], [34.73279036287618, 31.874222347732598], [34.79244994756452, 31.92226178996439], [34.989920353138466, 31.896977560287475], [35.20522194466407, 31.7788171713412], [35.23037222384999, 31.285532220016325], [35.22367135812832, 31.249922505474558], [34.817721005694146, 30.626897276099523], [34.574232913264595, 31.41673960326309]]], "type": "Polygon"}}, "transit": {"area": 0.5400266413526706, "color": "#4ECDC4", "geometry": {"coordinates": [[[34.63035434243112, 31.317517342693982], [34.57100206646957, 31.664668817282678], [34.65980289913556, 31.80878619333203], [34.989920353138466, 31.896977560287475], [35.20522194466407, 31.7788171713412], [35.23037222384999, 31.285532220016325], [35.22367135812832, 31.249922505474558], [34.817721005694146, 30.626897276099523], [34.63035434243112, 31.317517342693982]]], "type": "Polygon"}}, "walk": {"area": 0.00024877571890470987, "color": "#FFE66D", "geometry": {"coordinates": [[[34.79623451875376, 31.262414060991492], [34.79896646843623, 31.270112896453025], [34.80343150264815, 31.270971603347977], [34.82216066716116, 31.269240201171957], [34.807938334776914, 31.254202527456016], [34.79623451875376, 31.262414060991492]]], "type": "Polygon"}}}}, "Soroka_Hospital": {"bounds": [34.56924526959899, 30.626897276099523, 35.23037222384999, 31.927065150958295], "center": [31.26265, 34.799452], "modes": {"bike": {"area": 0.0014536376051543969, "color": "#96CEB4", "geometry": {"coordinates": [[[34.76107581099681, 31.265978026854295], [34.79772798039277, 31.282798359733942], [34.82216066716116, 31.269240201171957], [34.796202066602255, 31.242561196578688], [34.78408636461147, 31.23770271271363], [34.76107581099681, 31.265978026854295]]], "type": "Polygon"}}, "car": {"area": 0.20435012859679771, "color": "#FF6B6B", "geometry": {"coordinates": [[[34.70388839889864, 31.024658616306798], [34.56924526959899, 31.4290822167143], [34.595820188907915, 31.528766637038455], [34.774737456158, 31.60705729939872], [35.085628870746575, 31.24168476541378], [35.0464079512308, 31.07108801793993], [35.024078574187, 31.05490502702153], [34.91939925788987, 30.989394885254907], [34.70388839889864, 31.024658616306798]]], "type": "Polygon"}}, "transit": {"area": 0.5725155550338452, "color": "#4ECDC4", "geometry": {"coordinates": [[[34.56924526959899, 31.4290822167143], [34.57100206646957, 31.664668817282678], [34.65980289913556, 31.80878619333203], [34.73279036287618, 31.874222347732598], [34.79244994756452, 31.92226178996439], [34.87066665214553, 31.927065150958295], [34.989920353138466, 31.896977560287475], [35.20522194466407, 31.7788171713412], [35.23037222384999, 31.285532220016325], [35.22367135812832, 31.249922505474558], [34.817721005694146, 30.626897276099523], [34.56924526959899, 31.4290822167143]]], "type": "Polygon"}}, "walk": {"area": 0.000529615474395121, "color": "#FFE66D", "geometry": {"coordinates": [[[34.79208041171158, 31.246261130607387], [34.78442790047252, 31.261534438753753], [34.793560913507974, 31.272781818746274], [34.80343150264815, 31.270971603347977], [34.8135047672524, 31.264721198572644], [34.80574828902443, 31.249354876022387], [34.796202066602255, 31.242561196578688], [34.79208041171158, 31.246261130607387]]], "type": "Polygon"}}}}};
@@ -260,8 +260,8 @@
         
         let currentPOI = 'BGU';
         let currentMode = 'layered';
-        let currentLayer = null;
         let map = null;
+        let mapReady = false;
 
         let loadingProgress = 0;
         const loadingScreen = document.querySelector('.loading-screen');
@@ -294,131 +294,141 @@
             }
         }
 
-        async function initMap() {
+        const MAP_STYLE = 'https://basemaps.cartocdn.com/gl/dark-matter-nolabels-gl-style/style.json';
+
+        function initMap() {
+            if (map) return;
             updateLoadingProgress(30);
-            if (!map) {
-                map = L.map('map', {
-                    preferCanvas: true,
-                    zoomControl: true
-                });
-                
-                updateLoadingProgress(60);
-                
-                await new Promise(resolve => {
-                    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-                        maxZoom: 19,
-                        onload: () => resolve()
-                    }).addTo(map);
-                });
-                
+            map = new maplibregl.Map({
+                container: 'map',
+                style: MAP_STYLE,
+                center: [34.8, 31.25],
+                zoom: 11
+            });
+            map.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'top-left');
+            updateLoadingProgress(60);
+            map.on('load', () => {
+                mapReady = true;
                 updateLoadingProgress(90);
-                // Set bounds to show all of Beer Sheva metropolitan area
-                const bounds = L.latLngBounds(
-                    [31.15, 34.65],  // Southwest corner
-                    [31.35, 34.95]   // Northeast corner
-                );
-                map.fitBounds(bounds);
+                renderCatchment();
+                hideLoadingScreen();
+            });
+        }
+
+        function catchmentFeatures() {
+            const poiData = catchmentData[currentPOI];
+            const modes = currentMode === 'layered'
+                ? Object.entries(poiData.modes).sort((a, b) => b[1].area - a[1].area)
+                : (poiData.modes[currentMode] ? [[currentMode, poiData.modes[currentMode]]] : []);
+            return modes.map(([, data]) => ({
+                type: 'Feature',
+                properties: { color: data.color },
+                geometry: data.geometry
+            }));
+        }
+
+        function extendBounds(bounds, coords) {
+            if (typeof coords[0] === 'number') {
+                bounds.extend(coords);
+            } else {
+                coords.forEach(coord => extendBounds(bounds, coord));
             }
-            hideLoadingScreen();
+        }
+
+        function renderCatchment() {
+            const features = catchmentFeatures();
+            const collection = { type: 'FeatureCollection', features };
+            if (map.getSource('catchment')) {
+                map.getSource('catchment').setData(collection);
+            } else {
+                map.addSource('catchment', { type: 'geojson', data: collection });
+                map.addLayer({
+                    id: 'catchment-fill',
+                    type: 'fill',
+                    source: 'catchment',
+                    paint: {
+                        'fill-color': ['get', 'color'],
+                        'fill-opacity': 0.6
+                    }
+                });
+                map.addLayer({
+                    id: 'catchment-line',
+                    type: 'line',
+                    source: 'catchment',
+                    paint: {
+                        'line-color': ['get', 'color'],
+                        'line-width': 1
+                    }
+                });
+            }
+
+            const center = catchmentData[currentPOI].center;
+            const poi = {
+                type: 'Feature',
+                properties: { label: poiInfo[currentPOI].display },
+                geometry: { type: 'Point', coordinates: [center[1], center[0]] }
+            };
+            if (map.getSource('poi')) {
+                map.getSource('poi').setData(poi);
+            } else {
+                map.addSource('poi', { type: 'geojson', data: poi });
+                map.addLayer({
+                    id: 'poi',
+                    type: 'circle',
+                    source: 'poi',
+                    paint: {
+                        'circle-radius': 8,
+                        'circle-color': 'rgba(255,255,255,0.2)',
+                        'circle-stroke-color': '#ffffff',
+                        'circle-stroke-width': 3
+                    }
+                });
+                map.on('click', 'poi', (event) => {
+                    const feature = event.features && event.features[0];
+                    if (!feature) return;
+                    new maplibregl.Popup({ closeButton: false, offset: 12 })
+                        .setLngLat(feature.geometry.coordinates)
+                        .setText(feature.properties.label)
+                        .addTo(map);
+                });
+                map.on('mouseenter', 'poi', () => {
+                    map.getCanvas().style.cursor = 'pointer';
+                });
+                map.on('mouseleave', 'poi', () => {
+                    map.getCanvas().style.cursor = '';
+                });
+            }
+
+            if (!features.length) return;
+
+            const bounds = new maplibregl.LngLatBounds();
+            features.forEach(feature => extendBounds(bounds, feature.geometry.coordinates));
+            let padding = 50;
+            let maxZoom = 13;
+            if (currentMode === 'walk') {
+                padding = 30;
+                maxZoom = 14;
+            } else if (currentMode === 'bike') {
+                padding = 40;
+                maxZoom = 13;
+            } else if (currentMode === 'layered') {
+                padding = 60;
+                maxZoom = 12;
+            }
+            map.fitBounds(bounds, { padding, maxZoom });
         }
 
         function updateMap() {
             initMap();
             const fadeOverlay = document.getElementById('fade-overlay');
             fadeOverlay.classList.add('active');
+            if (mapReady) renderCatchment();
 
-            // Remove current layer if it exists
-            if (currentLayer) {
-                map.removeLayer(currentLayer);
-            }
-
-            const poiData = catchmentData[currentPOI];
-            const newLayer = L.layerGroup();
-            let currentBounds = null;
-            
-            if (currentMode === 'layered') {
-                // Sort modes by area before adding to map
-                const sortedModes = Object.entries(poiData.modes)
-                    .sort((a, b) => b[1].area - a[1].area);
-                
-                sortedModes.forEach(([mode, data]) => {
-                    const layer = L.geoJSON(data.geometry, {
-                        style: {
-                            color: data.color,
-                            fillColor: data.color,
-                            fillOpacity: 0.6,
-                            weight: 1
-                        }
-                    }).addTo(newLayer);
-                    
-                    // Update bounds to include all layers
-                    if (!currentBounds) {
-                        currentBounds = layer.getBounds();
-                    } else {
-                        currentBounds.extend(layer.getBounds());
-                    }
-                });
-            } else if (poiData.modes[currentMode]) {
-                const modeData = poiData.modes[currentMode];
-                const layer = L.geoJSON(modeData.geometry, {
-                    style: {
-                        color: modeData.color,
-                        fillColor: modeData.color,
-                        fillOpacity: 0.6,
-                        weight: 1
-                    }
-                }).addTo(newLayer);
-                
-                // Use specific mode bounds
-                currentBounds = layer.getBounds();
-            }
-
-            // Add POI marker
-            L.circleMarker(poiData.center, {
-                radius: 8,
-                color: 'white',
-                fillColor: 'white',
-                fillOpacity: 0.2,
-                weight: 3
-            })
-            .bindPopup(poiInfo[currentPOI].display)
-            .addTo(newLayer);
-
-            // Add new layer to map
-            newLayer.addTo(map);
-            currentLayer = newLayer;
-
-            // Fit bounds with mode-specific padding and zoom adjustments
-            if (currentBounds) {
-                let padding = [50, 50];  // Default padding
-                let maxZoom = 13;        // Default max zoom
-                
-                // Adjust zoom and padding based on mode
-                if (currentMode === 'walk') {
-                    padding = [30, 30];  // Tighter padding for walking
-                    maxZoom = 14;        // Allow closer zoom for walking
-                } else if (currentMode === 'bike') {
-                    padding = [40, 40];
-                    maxZoom = 13;
-                } else if (currentMode === 'layered') {
-                    padding = [60, 60];  // Larger padding for all modes
-                    maxZoom = 12;        // Further out for overview
-                }
-                
-                map.fitBounds(currentBounds, {
-                    padding: padding,
-                    maxZoom: maxZoom
-                });
-            }
-
-            // Update UI
             document.querySelectorAll('button').forEach(btn => btn.classList.remove('active'));
             document.getElementById(`poi-${currentPOI}`).classList.add('active');
             document.getElementById(`mode-${currentMode}`).classList.add('active');
-            
             updateExplanation();
 
-            // Remove fade overlay
             setTimeout(() => {
                 fadeOverlay.classList.remove('active');
             }, 300);
